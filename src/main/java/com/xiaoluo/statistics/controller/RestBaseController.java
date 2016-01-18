@@ -2,6 +2,7 @@ package com.xiaoluo.statistics.controller;
 
 import com.xiaoluo.constant.AllRetCode;
 import com.xiaoluo.exception.ServiceException;
+import com.xiaoluo.statistics.exception.StatisticException;
 import com.xiaoluo.statistics.vo.ApiResult;
 import com.xl.rpc.exception.RemoteException;
 import org.slf4j.Logger;
@@ -36,8 +37,8 @@ public class RestBaseController {
     String handleException(HttpServletRequest request,Throwable ex){
         ApiResult result=new ApiResult();
 
-        if(ex instanceof ExecutionException &&ex.getCause() instanceof RemoteException &&ex.getCause().getCause() instanceof ServiceException){
-            ServiceException se=(ServiceException)(ex.getCause().getCause());
+        if(ex instanceof StatisticException){
+            ServiceException se=(ServiceException)ex;
             result.setCode(se.getErrorCode());
             result.setMsg(se.getError());
         }else{

@@ -1,16 +1,18 @@
 package com.xiaoluo.statistics.vo;
 
+import java.util.List;
+
 /**
- * Created by Caedmon on 2015/12/24.
+ * Created by Caedmon on 2016/1/18.
  */
-public class SimpleStatResult {
+public class SearchStatResult {
+
     private long pv;
     private double uv;
     private double ip;
+    private List<TermsResult> termsResults;
     private String from;
     private String to;
-    private long cost;
-    private long activeCount;
     public long getPv() {
         return pv;
     }
@@ -35,14 +37,6 @@ public class SimpleStatResult {
         this.ip = ip;
     }
 
-    public long getCost() {
-        return cost;
-    }
-
-    public void setCost(long cost) {
-        this.cost = cost;
-    }
-
     public String getFrom() {
         return from;
     }
@@ -55,15 +49,36 @@ public class SimpleStatResult {
         return to;
     }
 
+    public List<TermsResult> getTermsResults() {
+        return termsResults;
+    }
+
+    public void setTermsResults(List<TermsResult> termsResults) {
+        this.termsResults = termsResults;
+    }
+
     public void setTo(String to) {
         this.to = to;
     }
+    public static class TermsResult{
+        private String key;
+        private long count;
 
-    public long getActiveCount() {
-        return activeCount;
+        public String getKey() {
+            return key;
+        }
+
+        public void setKey(String key) {
+            this.key = key;
+        }
+
+        public long getCount() {
+            return count;
+        }
+
+        public void setCount(long count) {
+            this.count = count;
+        }
     }
 
-    public void setActiveCount(long activeCount) {
-        this.activeCount = activeCount;
-    }
 }

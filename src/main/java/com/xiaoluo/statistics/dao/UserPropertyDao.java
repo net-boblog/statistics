@@ -1,5 +1,6 @@
 package com.xiaoluo.statistics.dao;
 
+import com.xiaoluo.statistics.constant.IdentityType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -13,37 +14,25 @@ import java.util.List;
 public class UserPropertyDao {
     @Autowired
     private JdbcTemplate jdbcTemplate;
-    public String getUidByProperty(String property, String value){
+    public String getUidByProperty(IdentityType identityType, String value){
         StringBuilder sql=new StringBuilder("SELECT uid from t_user_property ");
-        sql.append(buildSqlCondition(property,value));
+        sql.append(buildSqlCondition(identityType,value));
         List<String> uids=jdbcTemplate.queryForList(sql.toString(), String.class);
         if(uids==null||uids.isEmpty()){
             return null;
         }
         return uids.get(uids.size() - 1);
     }
-    private String buildSqlCondition(String property,String value){
+    private String buildSqlCondition(IdentityType identityType,String value){
         StringBuilder sql=new StringBuilder(" where 1=1 ");
-        if(property.equals("app_cookie")){
-            sql.append(" and app_cookie='");
+        if(identityType!=null){
+            sql.append(" and ").append(identityType.name()).append("='");
+            sql.append(value).append("'");
         }
-        if(property.equals("h5_cookie")){
-            sql.append(" and h5_cookie ='");
-        }
-        if(property.equals("pc_cookie")){
-            sql.append(" and pc_cookie ='");
-        }
-        if(property.equals("wx_open_id")){
-            sql.append(" and wx_open_id ='");
-        }
-        if(property.equals("app_imei")){
-            sql.append(" and app_imei='");
-        }
-        sql.append(value).append("'");
         return sql.toString();
     }
-    public int updateBindUid(String uid,String property,String value){
-        String condition=buildSqlCondition(property,value);
+    public int updateBindUid(String uid,IdentityType identityType,String identityId){
+        String condition=buildSqlCondition(identityType,identityId);
         String sql="UPDATE t_user_property set uid='"+uid+"'"+condition;
         return jdbcTemplate.update(sql);
     }
@@ -51,8 +40,8 @@ public class UserPropertyDao {
         String sql="UPDATE t_user_property set uid=? where uid = ?";
         return jdbcTemplate.update(sql, new Object[]{oldUid, newUid});
     }
-    public int updatePhone(String phone,String property,String value){
-        String sql="UPDATE t_user_property set phone='"+phone+"' where "+property+"='"+ value +"'";
+    public int updatePhone(String phone,IdentityType identityType,String value){
+        String sql="UPDATE t_user_property set phone='"+phone+"' where "+identityType.name()+"='"+ value +"'";
         return jdbcTemplate.update(sql);
     }
     public int updateOldUid(List<String> oldUids,String newUid){
@@ -70,8 +59,8 @@ public class UserPropertyDao {
         String sql="SELECT DISTINCT(uid) FROM t_user_property where phone='"+phone+"'";
         return jdbcTemplate.queryForList(sql,String.class);
     }
-    public void insert(String uid,String phone,String property,String value){
-        StringBuilder sql=new StringBuilder("INSERT INTO t_user_property (uid,phone,"+property+") VALUES (?,?,?)");
+    public void insert(String uid,String phone,IdentityType identityType,String value){
+        StringBuilder sql=new StringBuilder("INSERT INTO t_user_property (uid,phone,"+identityType.name()+") VALUES (?,?,?)");
 
         jdbcTemplate.update(sql.toString(),new Object[]{uid,phone,value});
     }

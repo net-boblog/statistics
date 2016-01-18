@@ -19,7 +19,7 @@
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
-    <bean id="elaticsearchManager" class="com.xiaoluo.statistics.elaticsearch.ElaticsearchManager">
+    <bean id="elaticsearchManager" class="com.xiaoluo.statistics.search.ElaticsearchManager">
         <property name="address" value="${elasticsearch.address}"/>
     </bean>
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"

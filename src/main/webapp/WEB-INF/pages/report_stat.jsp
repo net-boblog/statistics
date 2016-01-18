@@ -4,7 +4,7 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html>
 <head>
-	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+	<meta http-equiv="Content-Type" params="text/html; charset=utf-8">
 	<title>日志统计系统</title>
 	<link rel="stylesheet" href="${ctx}/resources/css/bootstrap.min.css">
 	<link rel="stylesheet" href="${ctx}/resources/css/bootstrap-theme.min.css">
@@ -20,7 +20,6 @@
 				var uvs=$.parseJSON(data.uvs);
 				var ips=$.parseJSON(data.ips);
 				var times=$.parseJSON(data.times);
-				var actives= $.parseJSON(data.actives);
 				$('#container').highcharts({
 					title: {
 						text: '统计曲线',
@@ -61,18 +60,52 @@
 					}, {
 						name: 'IP',
 						data: ips
-					},{
-						name: '活跃',
-						data:actives
 					}]
 				})
 			});
 		}
+		function saveTemplate(){
+			var params = {};
+			var a = $('#searchForm').serializeArray();
+			$.each(a, function() {
+				if (params[this.name] !== undefined) {
+					if (!params[this.name].push) {
+						params[this.name] = [params[this.name]];
+					}
+					params[this.name].push(this.value || '');
+				} else {
+					params[this.name] = this.value || '';
+				}
+			});
+			$.ajax({
+				url:"${ctx}/template/update",
+				data:params,
+				type:post,
+				error:function(e){
+					alert(e);
+				},
+				success:function(result){
+
+				}
+			})
+		}
 	</script>
 </head>
 <body>
+<%--private int id;--%>
+<%--private int type;--%>
+<%--private String name;--%>
+<%--private int interval;--%>
+<%--private int unit;--%>
+<%--private String params;--%>
 <div >
-	<form id="searchForm" action="${ctx}/report/multiSearch" method="post" class="form-horizontal">
+	<form id="searchForm" class="form-horizontal">
+		<div class="form-group">
+			<label  class="col-sm-2 control-label" for="name">模板名</label>
+			<div class="col-sm-4">
+				<input class="form-control" id="name" name="name" type="text" placeholder="搜索模板名" />
+			</div>
+		</div>
 		<div class="form-group">
 			<label  class="col-sm-2 control-label" for="terminals">终端</label>
 			<div class="col-sm-4">
@@ -113,18 +146,18 @@
 				<input class="form-control" id="keyWords" name="keyWords" type="text" placeholder="" />
 			</div>
 		</div>
-		<div class="form-group">
-			<label  class="col-sm-2 control-label" for="from">起止时间</label>
-			<div class="col-sm-4">
-				<div class="input-group">
-					<input class="form-control" id="from" name="from" type="text" placeholder="yyyy-MM-dd HH:mm:ss" />
-					<div class="input-group-btn">
-						<label  class="col-sm-1 control-label" for="to" style="font-size: 14px;">到</label>
-					</div>
-					<input class="form-control" id="to" name="to" type="text" placeholder="yyyy-MM-dd HH:mm:ss"/>
-				</div>
-			</div>
-		</div>
+		<%--<div class="form-group">--%>
+			<%--<label  class="col-sm-2 control-label" for="from">起止时间</label>--%>
+			<%--<div class="col-sm-4">--%>
+				<%--<div class="input-group">--%>
+					<%--<input class="form-control" id="from" name="from" type="text" placeholder="yyyy-MM-dd HH:mm:ss" />--%>
+					<%--<div class="input-group-btn">--%>
+						<%--<label  class="col-sm-1 control-label" for="to" style="font-size: 14px;">到</label>--%>
+					<%--</div>--%>
+					<%--<input class="form-control" id="to" name="to" type="text" placeholder="yyyy-MM-dd HH:mm:ss"/>--%>
+				<%--</div>--%>
+			<%--</div>--%>
+		<%--</div>--%>
 		<div class="form-group">
 			<!-- Search input-->
 			<label  class="col-sm-2 control-label" for="interval">间隔时间</label>
@@ -145,14 +178,21 @@
 		</div>
 		<div class="form-group">
 			<!-- Search input-->
-			<label  class="col-sm-2 control-label" for="minActiveCount">活跃判定次数</label>
+			<label  class="col-sm-2 control-label" for="minTermsCount">最少出现次数</label>
 			<div class="col-sm-4">
-				<input class="form-control" id="minActiveCount" name="minActiveCount" type="text" placeholder="" />
+				<input class="form-control" id="minTermsCount" name="minTermsCount" type="text" placeholder="" />
+			</div>
+		</div>
+		<div class="form-group">
+			<!-- Search input-->
+			<label  class="col-sm-2 control-label" for="termsCountField">统计字段</label>
+			<div class="col-sm-4">
+				<input class="form-control" id="termsCountField" name="termsCountField" type="text" placeholder="" />
 			</div>
 		</div>
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
-				<input class="form-control" type="button" value="搜素" onclick="loadData()" />
+				<input class="form-control" type="button" value="保存" onclick="saveTemplate()" />
 			</div>
 		</div>
 	</form>

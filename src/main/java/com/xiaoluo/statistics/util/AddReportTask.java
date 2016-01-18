@@ -2,7 +2,7 @@ package com.xiaoluo.statistics.util;
 
 import com.alibaba.fastjson.JSON;
 import com.xiaoluo.statistics.service.ActionReportService;
-import com.xiaoluo.statistics.vo.ActionReport;
+import com.xiaoluo.statistics.entity.ActionReport;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
@@ -55,7 +55,7 @@ public class AddReportTask implements Runnable{
         for(int i=0;i<50000;i++){
             ActionReport report=new ActionReport();
             Random random=new Random();
-            report.setPrefixPage(prefixPages[random.nextInt(prefixPages.length)]);
+            report.setPrefix_page(prefixPages[random.nextInt(prefixPages.length)]);
             report.setUid(uids[random.nextInt(uids.length)]);
             report.setChannel(channels[random.nextInt(channels.length)]);
             report.setIp(ips[random.nextInt(ips.length)]);

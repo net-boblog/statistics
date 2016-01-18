@@ -9,6 +9,7 @@ public class ApiResult {
     private int code;
     private Object data;
     private String msg;
+    public static final ApiResult EMPTY_RESULT=new ApiResult();
     public ApiResult(int code, Object data, String msg){
         this.code=code;
         this.data=data;
