@@ -41,7 +41,7 @@
 			<div class="col-sm-8">
 				<c:forEach items="${terminals}" var="terminal" varStatus="status">
 					<span>
-						<input type="checkbox" id="terminals${status.index}" name="terminals" value="${terminal.key}">
+						<input type="checkbox" id="terminals${status.index}" name="terminals" value="${terminal.id}">
 						<label for="terminals${status.index}">${terminal.description}</label>
 					</span>
 				</c:forEach>
@@ -52,7 +52,7 @@
 			<div class="col-sm-8">
 				<c:forEach items="${channels}" var="channel" varStatus="status">
 					<span>
-						<input type="checkbox" id="channels${status.index}" name="channels" value="${channel.key}">
+						<input type="checkbox" id="channels${status.index}" name="channels" value="${channel.id}">
 						<label for="channels${status.index}">${channel.description}</label>
 					</span>
 				</c:forEach>
@@ -65,7 +65,7 @@
 			<div class="col-sm-8">
 				<c:forEach items="${pages}" var="page" varStatus="status">
 					<span>
-						<input type="checkbox" id="prefixPages${status.index}" name="prefixPages" value="${page.key}">
+						<input type="checkbox" id="prefixPages${status.index}" name="prefixPages" value="${page.id}">
 						<label for="prefixPages${status.index}">${page.description}</label>
 					</span>
 				</c:forEach>
@@ -78,7 +78,7 @@
 			<div class="col-sm-8">
 				<c:forEach items="${pages}" var="page" varStatus="status">
 					<span>
-						<input type="checkbox" id="currentPages${status.index}" name="currentPages" value="${page.key}">
+						<input type="checkbox" id="currentPages${status.index}" name="currentPages" value="${page.id}">
 						<label for="currentPages${status.index}">${page.description}</label>
 					</span>
 				</c:forEach>
@@ -90,7 +90,7 @@
 			<div class="col-sm-8">
 				<c:forEach items="${events}" var="event" varStatus="status">
 					<span>
-						<input type="checkbox" id="events${status.index}" name="events" value="${event.key}">
+						<input type="checkbox" id="events${status.index}" name="events" value="${event.id}">
 						<label for="events${status.index}">${event.description}</label>
 					</span>
 				</c:forEach>
