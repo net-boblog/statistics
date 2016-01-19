@@ -48,21 +48,26 @@ public class ActionReportController extends RestBaseController{
     }
     @RequestMapping("/searchByTemplate")
     public String searchByTemplate(Model model,int templateId, @RequestParam(required = false) Date from, @RequestParam (required = false)Date to) throws Exception{
-        List<SearchStatResult> list=actionReportService.search(templateId,from,to);
+        TotalStatResult totalStatResult=actionReportService.search(templateId,from,to);
         List<Long> pvs=new ArrayList<Long>();
         List<Double> uvs=new ArrayList<Double>();
         List<Double> ips=new ArrayList<Double>();
         List<String> times=new ArrayList<String>();
-        for(SearchStatResult result:list){
+        for(SearchStatResult result:totalStatResult.getSectionStatResults()){
             pvs.add(result.getPv());
             uvs.add(result.getUv());
             ips.add(result.getIp());
             times.add("\""+result.getTo()+"\"");
         }
+        model.addAttribute("totalPv",totalStatResult.getTotalStatResult().getPv());
+        model.addAttribute("totalUv",totalStatResult.getTotalStatResult().getUv());
+        model.addAttribute("totalIp",totalStatResult.getTotalStatResult().getIp());
+        model.addAttribute("termsResult",totalStatResult.getTermsResults());
         model.addAttribute("pvs",Arrays.toString(pvs.toArray()));
         model.addAttribute("uvs",Arrays.toString(uvs.toArray()));
-         model.addAttribute("ips",Arrays.toString(ips.toArray()));
-      model.addAttribute("times", Arrays.toString(times.toArray()));
+        model.addAttribute("ips",Arrays.toString(ips.toArray()));
+        model.addAttribute("times", Arrays.toString(times.toArray()));
+        model.addAttribute("termsCountField",totalStatResult.getTermsCountFiled());
         return "search_result";
     }
     @RequestMapping("/rebuild")

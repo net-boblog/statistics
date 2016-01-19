@@ -71,15 +71,38 @@ public class ActionReportService {
             bindEventSet.add(bindEvent);
         }
     }
-    public Map<String,Object> search(SearchParams params) throws Exception{
+    public TotalStatResult search(SearchParams params) throws Exception{
         SearchResponse response= createSearchRequestBuilder(params).get();
-        Map<String,Object> result=new HashMap<String, Object>();
-        result.put("pv", response.getHits().totalHits());
-        result.put("uv", response.getAggregations().get("uv").getProperty("value"));
-        result.put("cost", response.getTookInMillis());
-        return result;
+        SearchStatResult searchStatResult=buildStatResult(params,response);
+        List<SearchStatResult.TermsResult> termsResults=getTermsResultList(response);
+        TotalStatResult totalStatResult=new TotalStatResult();
+        totalStatResult.setTotalStatResult(searchStatResult);
+        totalStatResult.setTermsResults(termsResults);
+        return totalStatResult;
+    }
+    private List<SearchStatResult.TermsResult> getTermsResultList(SearchResponse searchResponse){
+        List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
+        for(Terms.Bucket bucket:((StringTerms)searchResponse.getAggregations().getProperty("terms_count")).getBuckets()){
+            SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
+            termsResult.setKey(bucket.getKeyAsString());
+            termsResult.setCount(bucket.getDocCount());
+            termsResults.add(termsResult);
+        }
+        return termsResults;
     }
     public SearchRequestBuilder createSearchRequestBuilder(SearchParams params){
+        if(params.getFrom()==null){
+            params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
+        }
+        if(params.getTo()==null){
+            params.setTo(new Date());
+        }
+        if(params.getUnit()==0){
+            params.setUnit(SearchParams.SearchIntervalUnit.DAY.value);
+        }
+        if(params.getInterval()==0){
+            params.setInterval(1);
+        }
         SearchRequestBuilder searchRequestBuilder=elaticsearchClient.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME);
         searchRequestBuilder.setExplain(true);
         BoolQueryBuilder query=QueryBuilders.boolQuery();
@@ -165,28 +188,19 @@ public class ActionReportService {
         asyncThreadPool.execute(task);
 
     }
-    public List<SearchStatResult> search(int templateId,Date from,Date to) throws Exception{
+    public TotalStatResult search(int templateId,Date from,Date to) throws Exception{
         SearchTemplate template=searchTemplateService.get(templateId);
         String params=template.getParams();
         SearchParams searchParams=JSON.parseObject(params,SearchParams.class);
         searchParams.setFrom(from);
         searchParams.setTo(to);
-        return multiSearch(searchParams);
+        TotalStatResult totalStatResult=search(searchParams);
+        List<SearchStatResult> sectionStatResults=multiSearch(searchParams);
+        totalStatResult.setSectionStatResults(sectionStatResults);
+        totalStatResult.setTermsCountFiled(searchParams.getTermsCountField());
+        return totalStatResult;
     }
     public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
-
-        if(params.getFrom()==null){
-            params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
-        }
-        if(params.getTo()==null){
-            params.setTo(new Date());
-        }
-        if(params.getUnit()==0){
-            params.setUnit(SearchParams.SearchIntervalUnit.DAY.value);
-        }
-        if(params.getInterval()==0){
-            params.setInterval(1);
-        }
         MultiSearchRequestBuilder requestBuilder=elaticsearchClient.prepareMultiSearch();
         SearchParams.SearchIntervalUnit unit= SearchParams.SearchIntervalUnit.valueOf(params.getUnit());
         int interval=params.getInterval();
@@ -222,7 +236,6 @@ public class ActionReportService {
             requestBuilder.add(createSearchRequestBuilder(itemParams).request());
             searchParamsList.add(itemParams);
         }
-
         MultiSearchResponse multiSearchResponse=requestBuilder.execute().get();
         System.out.println(multiSearchResponse.toString());
         MultiSearchResponse.Item[] items=multiSearchResponse.getResponses();
@@ -230,29 +243,25 @@ public class ActionReportService {
         int i=0;
         for(MultiSearchResponse.Item item:items){
             SearchResponse response=item.getResponse();
-            SearchStatResult result=new SearchStatResult();
             if(response==null){
                 log.error("MultiSearch error {}", item.getFailureMessage());
                 break;
             }
-            result.setPv(response.getHits().totalHits());
-            Aggregations aggregations=response.getAggregations();
-            result.setUv((Double) aggregations.get("uv").getProperty("value"));
-            result.setIp((Double) aggregations.get("ip").getProperty("value"));
-            List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
-            for(Terms.Bucket bucket:((StringTerms)aggregations.getProperty("terms_count")).getBuckets()){
-                SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
-                termsResult.setKey(bucket.getKeyAsString());
-                termsResult.setCount(bucket.getDocCount());
-                termsResults.add(termsResult);
-            }
-            result.setFrom(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParamsList.get(i).getFrom()));
-            result.setTo(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParamsList.get(i).getTo()));
-            result.setTermsResults(termsResults);
+            SearchStatResult result=buildStatResult(searchParamsList.get(i),response);
             results.add(result);
             i++;
         }
         return results;
+    }
+    private SearchStatResult buildStatResult(SearchParams searchParams,SearchResponse response){
+        SearchStatResult result=new SearchStatResult();
+        result.setPv(response.getHits().totalHits());
+        Aggregations aggregations=response.getAggregations();
+        result.setUv((Double) aggregations.get("uv").getProperty("value"));
+        result.setIp((Double) aggregations.get("ip").getProperty("value"));
+        result.setFrom(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParams.getFrom()));
+        result.setTo(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParams.getTo()));
+        return result;
     }
     public void insert(FullActionReport report) throws Exception{
         //判断事件是否为注册或登录事件
