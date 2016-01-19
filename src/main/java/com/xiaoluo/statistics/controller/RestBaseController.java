@@ -38,8 +38,7 @@ public class RestBaseController {
         ApiResult result=new ApiResult();
 
         if(ex instanceof StatisticException){
-            ServiceException se=(ServiceException)ex;
-            result.setCode(se.getErrorCode());
+            StatisticException se=(StatisticException)ex;
             result.setMsg(se.getError());
         }else{
             ex.printStackTrace();

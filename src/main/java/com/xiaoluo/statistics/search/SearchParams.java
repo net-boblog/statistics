@@ -1,6 +1,7 @@
 package com.xiaoluo.statistics.search;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by Caedmon on 2015/12/24.
@@ -8,11 +9,11 @@ import java.util.Date;
 public class SearchParams {
     private Date from;
     private Date to;
-    private String prefixPages;
-    private String currentPages;
-    private String channels;
-    private String terminals;
-    private String events;
+    private List<String> prefixPages;
+    private List<String> currentPages;
+    private List<String> channels;
+    private List<String> terminals;
+    private List<String> events;
     private String keyWords;
     private int interval;
     private int unit;
@@ -20,20 +21,20 @@ public class SearchParams {
     private int minTermsCount;
     private String termsCountField;
     public enum SearchIntervalUnit{
-        MINUTE(0),HOUR(1),DAY(2),MONTH(3);
+        MINUTE(1),HOUR(2),DAY(3),MONTH(4);
         public int value;
         SearchIntervalUnit(int value){
             this.value=value;
         }
         public static SearchIntervalUnit valueOf(int value){
             switch (value){
-                case 0:
-                    return MINUTE;
                 case 1:
-                    return HOUR;
+                    return MINUTE;
                 case 2:
-                    return DAY;
+                    return HOUR;
                 case 3:
+                    return DAY;
+                case 4:
                     return MONTH;
                 default:
                     throw new IllegalArgumentException("Mismatch unit value");
@@ -56,43 +57,43 @@ public class SearchParams {
         this.to = to;
     }
 
-    public String getPrefixPages() {
+    public List<String> getPrefixPages() {
         return prefixPages;
     }
 
-    public void setPrefixPages(String prefixPages) {
+    public void setPrefixPages(List<String> prefixPages) {
         this.prefixPages = prefixPages;
     }
 
-    public String getCurrentPages() {
+    public List<String> getCurrentPages() {
         return currentPages;
     }
 
-    public void setCurrentPages(String currentPages) {
+    public void setCurrentPages(List<String> currentPages) {
         this.currentPages = currentPages;
     }
 
-    public String getChannels() {
+    public List<String> getChannels() {
         return channels;
     }
 
-    public void setChannels(String channels) {
+    public void setChannels(List<String> channels) {
         this.channels = channels;
     }
 
-    public String getTerminals() {
+    public List<String> getTerminals() {
         return terminals;
     }
 
-    public void setTerminals(String terminals) {
+    public void setTerminals(List<String> terminals) {
         this.terminals = terminals;
     }
 
-    public String getEvents() {
+    public List<String> getEvents() {
         return events;
     }
 
-    public void setEvents(String events) {
+    public void setEvents(List<String> events) {
         this.events = events;
     }
 

@@ -1,6 +1,7 @@
 package com.xiaoluo.statistics.controller;
 
 import com.xiaoluo.statistics.constant.StatErrorCode;
+import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.service.DictService;
 import com.xiaoluo.statistics.vo.ApiResult;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
  * Created by Caedmon on 2016/1/14.
  */
 @Controller
+@RequestMapping("/dict")
 public class DictController extends RestBaseController{
     @Autowired
     private DictService dictService;
     @RequestMapping("/update")
-    public @ResponseBody String update(int type,String key,String description){
+    public @ResponseBody String update(Dict dict){
         ApiResult result=new ApiResult();
-        if(dictService.update(type,key,description)<1){
+        if(dictService.update(dict)<1){
             result.setCode(StatErrorCode.UPDATE_FAIL);
         }
         return result.toString();

@@ -1,6 +1,7 @@
 package com.xiaoluo.statistics.service;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import com.xiaoluo.statistics.constant.IdentityType;
 import com.xiaoluo.statistics.search.ElaticsearchManager;
 import com.xiaoluo.statistics.entity.ActionReport;
@@ -92,30 +93,25 @@ public class ActionReportService {
         if(params.getTo()!=null){
             query.filter(QueryBuilders.rangeQuery("time").to(params.getTo().getTime()));
         }
-        if(!StringUtils.isEmpty(params.getChannels())){
-            String[] channels=params.getChannels().split(",");
-            query.filter(QueryBuilders.termsQuery("channel", channels));
+        if(params.getChannels()!=null&&!params.getChannels().isEmpty()){
+            query.filter(QueryBuilders.termsQuery("channel", params.getChannels()));
         }
-        if(!StringUtils.isEmpty(params.getEvents())){
-            String[] events=params.getEvents().split(",");
-            query.filter(QueryBuilders.termsQuery("event", events));
+        if(params.getEvents()!=null&&params.getEvents().size()>0){
+            query.filter(QueryBuilders.termsQuery("event", params.getEvents()));
 
         }
         if(!StringUtils.isEmpty(params.getKeyWords())){
             String[] keyWords=params.getKeyWords().split(",");
             query.filter(QueryBuilders.termsQuery("key_word", keyWords));
         }
-        if(!StringUtils.isEmpty(params.getPrefixPages())){
-            String[] prefixPages=params.getPrefixPages().split(",");
-            query.filter(QueryBuilders.termsQuery("prefix_page", prefixPages));
+        if(params.getPrefixPages()!=null&&params.getPrefixPages().size()>0){
+            query.filter(QueryBuilders.termsQuery("prefix_page", params.getPrefixPages()));
         }
-        if(!StringUtils.isEmpty(params.getCurrentPages())){
-            String[] currentPages=params.getCurrentPages().split(",");
-            query.filter(QueryBuilders.termsQuery("current_page", currentPages));
+        if(params.getCurrentPages()!=null&&params.getCurrentPages().size()>0){
+            query.filter(QueryBuilders.termsQuery("current_page", params.getCurrentPages()));
         }
-        if(!StringUtils.isEmpty(params.getTerminals())){
-            String[] terminals=params.getTerminals().split(",");
-            query.filter(QueryBuilders.termsQuery("terminal", terminals));
+        if(params.getTerminals()!=null&&params.getTerminals().size()>0){
+            query.filter(QueryBuilders.termsQuery("terminal", params.getTerminals()));
         }
 
         searchRequestBuilder.setQuery(query);
@@ -169,18 +165,27 @@ public class ActionReportService {
         asyncThreadPool.execute(task);
 
     }
-    public List<SearchStatResult> search(int templateId) throws Exception{
+    public List<SearchStatResult> search(int templateId,Date from,Date to) throws Exception{
         SearchTemplate template=searchTemplateService.get(templateId);
         String params=template.getParams();
         SearchParams searchParams=JSON.parseObject(params,SearchParams.class);
+        searchParams.setFrom(from);
+        searchParams.setTo(to);
         return multiSearch(searchParams);
     }
     public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
+
         if(params.getFrom()==null){
-            throw new StatisticException("开始时间不能为空");
+            params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
         }
         if(params.getTo()==null){
             params.setTo(new Date());
+        }
+        if(params.getUnit()==0){
+            params.setUnit(SearchParams.SearchIntervalUnit.DAY.value);
+        }
+        if(params.getInterval()==0){
+            params.setInterval(1);
         }
         MultiSearchRequestBuilder requestBuilder=elaticsearchClient.prepareMultiSearch();
         SearchParams.SearchIntervalUnit unit= SearchParams.SearchIntervalUnit.valueOf(params.getUnit());
@@ -312,4 +317,5 @@ public class ActionReportService {
         PutMappingResponse putMappingResponse=elaticsearchClient.admin().indices().putMapping(putMappingRequest).get();
         return putMappingResponse;
     }
+
 }

@@ -15,8 +15,11 @@ import org.springframework.stereotype.Service;
 public class SearchTemplateService {
     @Autowired
     private SearchTemplateDao searchTemplateDao;
-    public SearchTemplate update(SearchTemplate template){
+    public int update(SearchTemplate template){
         return searchTemplateDao.update(template);
+    }
+    public SearchTemplate insert(SearchTemplate template){
+        return searchTemplateDao.insert(template);
     }
     public DataPage<SearchTemplate> find(SearchTemplateFilter filter){
         return searchTemplateDao.find(filter);

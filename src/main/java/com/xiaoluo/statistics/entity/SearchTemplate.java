@@ -7,8 +7,6 @@ public class SearchTemplate {
     private int id;
     private int type;
     private String name;
-    private int interval;
-    private int unit;
     private String params;
 
     public int getId() {
@@ -41,21 +39,5 @@ public class SearchTemplate {
 
     public void setParams(String params) {
         this.params = params;
-    }
-
-    public int getInterval() {
-        return interval;
-    }
-
-    public void setInterval(int interval) {
-        this.interval = interval;
-    }
-
-    public int getUnit() {
-        return unit;
-    }
-
-    public void setUnit(int unit) {
-        this.unit = unit;
     }
 }

@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSONObject;
 import com.xiaoluo.statistics.entity.FullActionReport;
 import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.service.ActionReportService;
+import com.xiaoluo.statistics.util.DateKit;
 import com.xiaoluo.statistics.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
@@ -29,26 +32,38 @@ public class ActionReportController extends RestBaseController{
         List<Double> uvs=new ArrayList<Double>();
         List<Double> ips=new ArrayList<Double>();
         List<String> times=new ArrayList<String>();
+//        for(SearchStatResult result:list){
+//            pvs.add(result.getPv());
+//            uvs.add(result.getUv());
+//            ips.add(result.getIp());
+//            times.add("\""+result.getTo()+"\"");
+//        }
+//        JSONObject jsonObject=new JSONObject();
+//        jsonObject.put("pvs", Arrays.toString(pvs.toArray()));
+//        jsonObject.put("uvs",Arrays.toString(uvs.toArray()));
+//        jsonObject.put("ips",Arrays.toString(ips.toArray()));
+//        jsonObject.put("times", Arrays.toString(times.toArray()));
+//        return jsonObject.toJSONString();
+        return null;
+    }
+    @RequestMapping("/searchByTemplate")
+    public String searchByTemplate(Model model,int templateId, @RequestParam(required = false) Date from, @RequestParam (required = false)Date to) throws Exception{
+        List<SearchStatResult> list=actionReportService.search(templateId,from,to);
+        List<Long> pvs=new ArrayList<Long>();
+        List<Double> uvs=new ArrayList<Double>();
+        List<Double> ips=new ArrayList<Double>();
+        List<String> times=new ArrayList<String>();
         for(SearchStatResult result:list){
             pvs.add(result.getPv());
             uvs.add(result.getUv());
             ips.add(result.getIp());
             times.add("\""+result.getTo()+"\"");
         }
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("pvs", Arrays.toString(pvs.toArray()));
-        jsonObject.put("uvs",Arrays.toString(uvs.toArray()));
-        jsonObject.put("ips",Arrays.toString(ips.toArray()));
-        jsonObject.put("times",Arrays.toString(times.toArray()));
-        return jsonObject.toJSONString();
-    }
-    @RequestMapping
-    public @ResponseBody String searchByTemplate(int templateId) throws Exception{
-        List<SearchStatResult> list=actionReportService.search(templateId);
-        ApiResult result=new ApiResult();
-        result.setData(list);
-        return result.toString();
-
+        model.addAttribute("pvs",Arrays.toString(pvs.toArray()));
+        model.addAttribute("uvs",Arrays.toString(uvs.toArray()));
+         model.addAttribute("ips",Arrays.toString(ips.toArray()));
+      model.addAttribute("times", Arrays.toString(times.toArray()));
+        return "search_result";
     }
     @RequestMapping("/rebuild")
     public @ResponseBody String rebuild(HttpServletRequest request) throws Exception{
@@ -57,10 +72,6 @@ public class ActionReportController extends RestBaseController{
         }
         return "Auth fail";
 
-    }
-    @RequestMapping("/stat")
-    public String statistics(){
-        return "report_stat";
     }
     @RequestMapping(value = "/insert",method = RequestMethod.POST)
     public @ResponseBody String insert(FullActionReport report) throws Exception{
