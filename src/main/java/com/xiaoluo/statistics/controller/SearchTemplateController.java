@@ -68,10 +68,10 @@ public class SearchTemplateController {
 
     @RequestMapping("/view")
     public String view(Model model){
-        List<Dict> pages=dictService.find(DictType.PAGE.value,null,null);
-        List<Dict> events=dictService.find(DictType.EVENT.value,null,null);
-        List<Dict> channels=dictService.find(DictType.CHANNEL.value,null,null);
-        List<Dict> terminals=dictService.find(DictType.TERMINAL.value,null,null);
+        List<Dict> pages=dictService.find(DictType.PAGE.value,null);
+        List<Dict> events=dictService.find(DictType.EVENT.value,null);
+        List<Dict> channels=dictService.find(DictType.CHANNEL.value,null);
+        List<Dict> terminals=dictService.find(DictType.TERMINAL.value,null);
         model.addAttribute("pages",pages);
         model.addAttribute("events",events);
         model.addAttribute("channels",channels);
