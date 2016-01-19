@@ -44,8 +44,11 @@ public class DictDao {
         String sql="DELETE FROM t_dict where id=?";
         return jdbcTemplate.update(sql,new Object[]{id});
     }
-    public List<Dict> find(int type, String description){
+    public List<Dict> find(String ids,int type, String description){
         StringBuilder sql=new StringBuilder("SELECT * FROM t_dict where 1=1");
+        if(!StringUtils.isEmpty(ids)){
+            sql.append(" and id in('").append(ids).append(")");
+        }
         if(type!=0){
             sql.append(" and type =").append(type);
         }
