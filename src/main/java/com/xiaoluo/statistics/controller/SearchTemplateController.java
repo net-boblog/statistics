@@ -63,7 +63,7 @@ public class SearchTemplateController {
     }
     @RequestMapping("/get")
     public @ResponseBody String get(int id){
-       return new ApiResult(searchTemplateService.get(id)).toString();
+        return new ApiResult(searchTemplateService.get(id)).toString();
     }
 
     @RequestMapping("/view")

@@ -7,10 +7,9 @@
 	<meta http-equiv="Content-Type" params="text/html; charset=utf-8">
 	<title>日志统计系统</title>
 	<link rel="stylesheet" href="${ctx}/resources/css/bootstrap.min.css">
-	<link rel="stylesheet" href="${ctx}/resources/css/bootstrap-theme.min.css">
 	<script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
 	<script type="text/javascript" src="${ctx}/resources/js/jquery/jquery.form.js"></script>
-	<script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+	<script src="${ctx}/resources/js/bootstrap/bootstrap.min.js"></script>
 	<script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
 	<script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
 
