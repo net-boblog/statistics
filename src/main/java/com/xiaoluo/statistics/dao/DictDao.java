@@ -45,7 +45,10 @@ public class DictDao {
         return jdbcTemplate.update(sql,new Object[]{id});
     }
     public List<Dict> find(int type, String description){
-        StringBuilder sql=new StringBuilder("SELECT * FROM t_dict where type= ").append(type);
+        StringBuilder sql=new StringBuilder("SELECT * FROM t_dict where 1=1");
+        if(type!=0){
+            sql.append(" and type =").append(type);
+        }
         if(!StringUtils.isEmpty(description)){
             sql.append(" and description like '%").append(description).append("%'");
         }
