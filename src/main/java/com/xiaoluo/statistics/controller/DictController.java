@@ -35,7 +35,7 @@ public class DictController extends RestBaseController{
         return result.toString();
     }
     @RequestMapping("/list")
-    public @ResponseBody String list(int type,@RequestParam(required = false)String description){
+    public @ResponseBody String list(@RequestParam(required = false) int type,@RequestParam(required = false)String description){
         ApiResult result=new ApiResult();
         result.setData(dictService.find(type,description));
         return result.toString();
