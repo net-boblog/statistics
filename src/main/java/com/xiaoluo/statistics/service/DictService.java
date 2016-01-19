@@ -29,18 +29,7 @@ public class DictService {
     public int del(int id){
         return dictDao.del(id);
     }
-    public List<Dict> find(int type,String description){
-        return dictDao.find(type,description);
-    }
-
-    public static void main(String[] args) {
-        String text="{\"currentPages\":\"login\",\"prefixPages\":[\"page01\",\"page02\",\"page03\"],\"events\":[\"login\"],\"unit\":\"3\",\"terminals\":[\"android\",\"ios\"],\"interval\":\"1\",\"keyWords\":\"\",\"channels\":[\"baidu\",\"qq\"],\"termsCountField\":\"uid\",\"minTermsCount\":\"1\"}";
-        JSONObject jsonObject=JSON.parseObject(text);
-        jsonObject.put("unit",jsonObject.getIntValue("unit"));
-        jsonObject.put("interval",jsonObject.getIntValue("interval"));
-        jsonObject.put("minTermsCount",jsonObject.getIntValue("minTermsCount"));
-        System.out.println(jsonObject.toJSONString());
-        SearchParams searchParams=JSON.parseObject(jsonObject.toJSONString(),SearchParams.class);
-        System.out.println(searchParams);
+    public List<Dict> find(String ids,int type,String description){
+        return dictDao.find(ids,type,description);
     }
 }
