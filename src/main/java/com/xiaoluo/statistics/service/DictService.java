@@ -26,11 +26,11 @@ public class DictService {
     public int update(Dict dict){
         return dictDao.update(dict);
     }
-    public int del(int type,String key){
-        return dictDao.del(type,key);
+    public int del(int id){
+        return dictDao.del(id);
     }
-    public List<Dict> find(int type, String key, String description){
-        return dictDao.find(type,key,description);
+    public List<Dict> find(int type,String description){
+        return dictDao.find(type,description);
     }
 
     public static void main(String[] args) {

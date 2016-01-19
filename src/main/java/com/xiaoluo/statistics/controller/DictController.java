@@ -27,17 +27,17 @@ public class DictController extends RestBaseController{
         return result.toString();
     }
     @RequestMapping("/del")
-    public @ResponseBody String del(int type,String key){
+    public @ResponseBody String del(int id){
         ApiResult result=new ApiResult();
-        if(dictService.del(type, key)<1){
+        if(dictService.del(id)<1){
             result.setCode(StatErrorCode.DELETE_FAIL);
         }
         return result.toString();
     }
     @RequestMapping("/list")
-    public @ResponseBody String list(int type,@RequestParam(required = false) String key,@RequestParam(required = false)String description){
+    public @ResponseBody String list(int type,@RequestParam(required = false)String description){
         ApiResult result=new ApiResult();
-        result.setData(dictService.find(type,key,description));
+        result.setData(dictService.find(type,description));
         return result.toString();
     }
 
