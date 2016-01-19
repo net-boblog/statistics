@@ -11,6 +11,7 @@
   <script src="${ctx}/resources/js/bootstrap/bootstrap.min.js"></script>
   <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
   <script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
+  <script src="${ctx}/resources/js/art-template.js"></script>
   <script type="text/javascript">
     </script>
 </head>
@@ -24,7 +25,7 @@
           <ul class="tag-group">
             <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
             <li class="tag tag-default" data-toggle="tab" data-target="#room2">新增模板</li>
-            <li class="tag tag-default" data-toggle="tab" data-target="#room3">3</li>
+            <li class="tag tag-default" data-toggle="tab" data-target="#room3">字典列表</li>
             <li class="tag tag-default" data-toggle="tab" data-target="#room4">4</li>
           </ul>
         </div>
@@ -57,8 +58,26 @@
               <iframe src="${ctx}/template/view" style="width:100%;height:100%;"></iframe>
             </div>
             <div class="tab-pane fade" id="room3">
-              <table>
-
+              <table id="resultTable" class="table table-bordered">
+                <thead>
+                <tr>
+                  <td>ID</td>
+                  <td>字段类型</td>
+                  <td>字段描述</td>
+                </tr>
+                </thead>
+                <tbody>
+                <c:forEach items="${templates}" var="template">
+                  <tr>
+                    <td>${template.id}</td>
+                    <td>${template.name}</td>
+                    <td>
+                      <a href="#">编辑</a>
+                      <a href="${ctx}/report/searchByTemplate?templateId=${template.id}">搜索</a>
+                    </td>
+                  </tr>
+                </c:forEach>
+                </tbody>
               </table>
             </div>
             <div class="tab-pane fade" id="room4">4</div>
@@ -69,7 +88,23 @@
         </div>
       </div>
     </div>
+<script type="text/html" id="distListTemp">
+  {{each list as item}}
+    <tr>
+      <td>{{ index }}</td>
+      <td>{{}}</td>
+      <td>{{}}</td>
+      <td><button class="btn btn-danger" data-id="">删除</button></td>
+    </tr>
+  {{/each}}
+</script>
+<script>
 
+  $.get('${ctx}/dict/list',function(data){
+    console.debug(data);
+
+  })
+</script>
 
 </body>
 </html>
