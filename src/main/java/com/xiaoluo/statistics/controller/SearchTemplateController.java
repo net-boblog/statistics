@@ -59,6 +59,16 @@ public class SearchTemplateController {
         model.addAttribute("total",searchTemplateDataPage.getTotal());
         model.addAttribute("pageSize",searchTemplateDataPage.getPageSize());
         model.addAttribute("lastPage",searchTemplateDataPage.getLastPage());
+
+        List<Dict> pages=dictService.find(DictType.PAGE.value,null);
+        List<Dict> events=dictService.find(DictType.EVENT.value,null);
+        List<Dict> channels=dictService.find(DictType.CHANNEL.value,null);
+        List<Dict> terminals=dictService.find(DictType.TERMINAL.value,null);
+        model.addAttribute("pages",pages);
+        model.addAttribute("events",events);
+        model.addAttribute("channels",channels);
+        model.addAttribute("terminals",terminals);
+
         return "template_list";
     }
     @RequestMapping("/get")
