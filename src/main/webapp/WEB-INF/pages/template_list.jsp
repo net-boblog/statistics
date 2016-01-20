@@ -23,8 +23,6 @@
           <ul class="tag-group">
             <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
               <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
-              <li class="tag tag-default" data-toggle="tab" data-target="#room3">3</li>
-              <li class="tag tag-default " data-toggle="tab" data-target="#room4">4</li>
           </ul>
         </div>
         <div class="box-body tab-content">

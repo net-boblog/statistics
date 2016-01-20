@@ -23,7 +23,7 @@ public class AuthController extends RestBaseController{
     public String doLogin(String name, String password, HttpServletRequest request){
         if(authName.equals(name)&&password.equals(authPassword)){
             request.getSession().setAttribute("SESSION_USER",name);
-            return "template_list";
+            return "redirect:/template/list";
 
         }else{
             return "用户名密码错误";
