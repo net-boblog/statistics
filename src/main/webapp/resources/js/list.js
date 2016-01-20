@@ -140,7 +140,7 @@ function saveTemplate(obj){//obj was a form
             $.alert(e);
         },
         success:function(){
-            window.location.href = URI(location.href).hash('updatedFrom').toString();
+            location.hash = "updatedFrom";
             location.reload();
         }
     })
