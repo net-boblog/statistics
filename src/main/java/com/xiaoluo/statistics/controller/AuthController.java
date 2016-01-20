@@ -26,7 +26,7 @@ public class AuthController extends RestBaseController{
             return "redirect:/template/list";
 
         }else{
-            return "用户名密码错误";
+            return "forward:/auth/login";
         }
     }
     @RequestMapping("/login")
