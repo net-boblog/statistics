@@ -16,13 +16,28 @@ $(function(){
         var tar= $(e.currentTarget).parents('form');
         saveTemplate(tar[0]);
     });
-    $(document.body).on('click','.saveTemplate',function(e){
-        var tar= $(e.currentTarget).parents('form');
-        saveTemplate(tar[0]);
+    $(document.body).on('click','.addDict',function(e){
+        var tar= $(e.currentTarget).parents('tr');
+        saveDict(tar[0]);
     });
     checkHash();
 })
 
+function saveDict($tr) {
+    var data = {};
+    data.type = $tr.find('#addDictType').value;
+    data.description = $tr.find('#addDictDesc').value;
+
+    if ( data.type || data.description ){
+        $.get(ROOT + '/dict/update',data,function(data){
+            console.debug(data);
+            if (data.code == 0) {
+                getDictList();
+            }
+        },'json');
+    }else{
+    }
+}
 function getDictList(){
     $.get(ROOT + '/dict/list',function(data){
         if (data.code == 0) {

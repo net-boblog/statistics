@@ -9,6 +9,9 @@
   <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
   <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery.form.js"></script>
   <script src="${ctx}/resources/js/bootstrap/bootstrap.min.js"></script>
+    <script>
+        var ROOT = '${ctx}';
+    </script>
 </head>
 <body>
     <div class="container">
@@ -18,17 +21,17 @@
       <div class="box">
         <div class="box-header">
           <ul class="tag-group">
-            <li class="tag tag-default active showtemplist" data-toggle="tab" data-target="#room1">模板列表</li>
-            <li class="tag tag-default " data-toggle="tab" data-target="#room3">字典列表</li>
-              <li class="tag tag-default addtemplis" data-toggle="tab" data-target="#room2">3</li>
+            <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
+              <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
+              <li class="tag tag-default" data-toggle="tab" data-target="#room3">3</li>
               <li class="tag tag-default " data-toggle="tab" data-target="#room4">4</li>
           </ul>
         </div>
         <div class="box-body tab-content">
             <div class="tab-pane fade active in" id="room1">
-                <div class="clearfix pb20">
-                    <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
-                </div>
+              <div class="clearfix pb20">
+                  <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
+              </div>
               <table id="resultTable" class="table table-bordered">
                 <thead>
                 <tr>
@@ -56,25 +59,26 @@
 
 
             <div class="tab-pane fade" id="room2">
-                3
+
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <td>ID</td>
+                        <td>字段类型</td>
+                        <td>字段描述</td>
+                        <td>操作</td>
+                    </tr>
+                    </thead>
+                    <tbody id="dictList">
+
+                    </tbody>
+                </table>
             </div>
 
 
 
             <div class="tab-pane fade" id="room3">
-              <table class="table table-bordered">
-                <thead>
-                <tr>
-                  <td>ID</td>
-                  <td>字段类型</td>
-                  <td>字段描述</td>
-                  <td>操作</td>
-                </tr>
-                </thead>
-                <tbody id="dictList">
-
-                </tbody>
-              </table>
+                3
             </div>
             <div class="tab-pane fade" id="room4">4</div>
 
@@ -100,19 +104,52 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
+    
 
 <script type="text/html" id="dictListTemp">
+    <tr>
+        <td>?</td>
+        <td>
+            <div class="center-block" style="width: 150px;">
+                <select name="dictType" id="addDictType" class="form-control">
+                    <option value="">请选择</option>
+                    <option value="1" {{if dictType=="1" }} selected='selected' {{/if}}>页面</option>
+                    <option value="2" {{if dictType=="2" }} selected='selected' {{/if}}>事件</option>
+                    <option value="3" {{if dictType=="3" }} selected='selected' {{/if}}>渠道</option>
+                    <option value="4" {{if dictType=="4" }} selected='selected' {{/if}}>终端</option>
+                </select>
+            </div>
+        </td>
+        <td>
+            <div class="center-block" style="width: 150px;">
+                <input type="text" id="addDictDesc" class="form-control text-center" placeholder="字段描述"/>
+            </div>
+        </td>
+        <td>
+            <button class="btn btn-primary addDict">添加</button>
+        </td>
+    </tr>
   {{each list as item}}
     <tr>
       <td>{{ item.id}}</td>
       <td>{{ item.type | filterDictType }}</td>
       <td>{{ item.description }}</td>
-      <td><button class="btn btn-danger editDict" data-id="{{ item.id}}">编辑</button></td>
+      <td><button class="btn btn-greyPurple editDict" data-id="{{ item.id}}">编辑</button></td>
     </tr>
   {{/each}}
 </script>
 
-
+<script type="text/html" id="selectTemp">
+    <div class="form-group">
+        <select name="dictType" class="form-control">
+            <option value="">请选择</option>
+            <option value="1" {{if dictType=="1" }} selected='selected' {{/if}}>页面</option>
+            <option value="2" {{if dictType=="2" }} selected='selected' {{/if}}>事件</option>
+            <option value="3" {{if dictType=="3" }} selected='selected' {{/if}}>渠道</option>
+            <option value="4" {{if dictType=="4" }} selected='selected' {{/if}}>终端</option>
+        </select>
+    </div>
+</script>
 <script type="text/html" id="templateTemp">
      <div class="form-group" style="display: none">
        <label  class="col-sm-2 control-label" for="id">ID</label>
@@ -241,11 +278,6 @@
      </div>
 </script>
 
-
-<script>
-var ROOT = '${ctx}';
-
-</script>
     <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
     <script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
     <script src="${ctx}/resources/js/art-template.js"></script>

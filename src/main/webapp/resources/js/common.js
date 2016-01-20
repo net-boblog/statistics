@@ -24,7 +24,58 @@ $.bom = {
     }
 };
 
+$.fajax = function(opt){
+    var layerIndex = null;
+    var post_data = {};
+    if(opt.animate){
+        var animateOption = $.extend({
+            shade: false,
+            type: 2,
+            time: 15,
+            shadeClose: false
+        }, opt.animate);
+        layerIndex = layer.open(animateOption);
+    }
+    $.ajax({
+        type: opt.type || 'GET',
+        url: opt.req ? (CGI_PATH + opt.req) : opt.url,
+        dataType: opt.dataType || 'json',
+        data: opt.postType && opt.postType == 'String' ?  opt.data :$.extend(post_data,(opt.data || {})) ,
+        async:opt.hasOwnProperty('async')? opt.async:true,
+        success : function(json){
 
+                if (json.code == 0){
+                    opt.success(json);
+                }
+
+                if(json.code == 0 && opt.animate && opt.animate.success){
+                    if(layerIndex !==null) layer.close(layerIndex);
+                }else{
+                    setTimeout(function(){
+                        if(layerIndex !==null) layer.close(layerIndex);
+                    },50);
+                }
+
+                if (json.code != 0) {
+                    layer.open({
+                        content : json.msg,
+                        time : 2
+                    });
+                }
+        },
+        timeout:10000,
+        error : function(err){
+            if(layerIndex !==null) layer.close(layerIndex);
+            layer.open({
+                content : "服务器没有响应 %>_<%",
+                time : 2
+            });
+            if(opt.errorCb){
+                opt.errorCb()
+            }
+        }
+    });
+};
 
 template.helper("filterDictType",function(type){
 
