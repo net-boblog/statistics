@@ -19,9 +19,6 @@
                                 expression="org.springframework.web.bind.annotation.ControllerAdvice"/>
     </context:component-scan>
 
-    <bean id="elaticsearchManager" class="com.xiaoluo.statistics.search.ElaticsearchManager">
-        <property name="address" value="${elasticsearch.address}"/>
-    </bean>
     <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
           destroy-method="close">
         <property name="driverClass" value="com.mysql.jdbc.Driver"/>
@@ -36,13 +33,23 @@
     <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate">
         <property name="dataSource" ref="dataSource"></property>
     </bean>
+    <bean id="authName" class="java.lang.String">
+        <constructor-arg value="${auth.name}"></constructor-arg>
+    </bean>
+    <bean id="authPassword" class="java.lang.String">
+        <constructor-arg value="${auth.password}"></constructor-arg>
+    </bean>
+    <bean id="elasticAddress" class="java.lang.String">
+        <constructor-arg value="${elastic.address}"></constructor-arg>
+    </bean>
     <bean id="bindEvents" class="java.lang.String">
-        <constructor-arg value="${bind.events}"/>
+        <constructor-arg value="${bind.events}"></constructor-arg>
     </bean>
     <beans profile="debug">
         <context:property-placeholder ignore-resource-not-found="true"
                                       location="classpath*:/debug.properties"/>
     </beans>
+
     <beans profile="product">
         <context:property-placeholder ignore-resource-not-found="true"
                                       location="classpath*:/product.properties"/>
