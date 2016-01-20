@@ -1,5 +1,5 @@
 /**
- * Created by Administrator on 2016/1/19.
+ * Created by zoe on 2016/1/19.
  */
 $(function(){
     getDictList();//更新字典列表
@@ -48,7 +48,7 @@ function saveDict($tr) {
     }
 
     if ( !data.type || !data.description ){
-        alert('请选择字段类型并填写字段描述');
+        $.alert('请选择字段类型并填写字段描述');
     }else{
         $.post(ROOT + '/dict/update',data,function(data){
             console.debug(data);
@@ -64,7 +64,7 @@ function getDictList(data){
         if (data.code == 0) {
             $('#dictList').html(template('dictListTemp',{list:data.data}));
         }else {
-            alert(data.msg);
+            $.alert(data.msg);
         }
     },'json')
 }
@@ -97,7 +97,7 @@ function editTemplate(id){
                 $('#templateModal').modal('show');
 
         }else {
-            alert(data.msg);
+            $.alert(data.msg);
         }
     },'json')
 }
@@ -137,7 +137,7 @@ function saveTemplate(obj){//obj was a form
         data:"data="+JSON.stringify(data),
         type:'POST',
         error:function(e){
-            alert(e);
+            $.alert(e);
         },
         success:function(){
             window.location.href = URI(location.href).hash('updatedFrom').toString();
@@ -147,9 +147,9 @@ function saveTemplate(obj){//obj was a form
 }
 
 function checkHash(){
-    switch (location.href.hash){
+    switch (location.hash.substr(1)){
         case 'updatedFrom':
-            layer.msg('模板保存成功!');
+            $.alert('模板保存成功!','primary');
             break;
         default :
             break;
