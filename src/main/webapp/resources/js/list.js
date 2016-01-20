@@ -24,6 +24,11 @@ $(function(){
         var tar= $(e.currentTarget).parents('tr');
         editDict(tar);
     });
+    $(document.body).on('click','.searchDictBtn',function(e){
+        var form= $(e.currentTarget).parents('form');
+        var data = form.serialize();
+        getDictList(data);
+    });
     checkHash();
 })
 
@@ -53,8 +58,9 @@ function saveDict($tr) {
         },'json');
     }
 }
-function getDictList(){
-    $.get(ROOT + '/dict/list',function(data){
+function getDictList(data){
+    var data = data || {};
+    $.post(ROOT + '/dict/list',data,function(data){
         if (data.code == 0) {
             $('#dictList').html(template('dictListTemp',{list:data.data}));
         }else {
