@@ -126,18 +126,12 @@
 			<label  class="col-sm-2 control-label" for="unit">间隔时间单位</label>
 			<div class="col-sm-4">
 				<select  id="unit" name="unit" class="form-control">
+					<option value="0">请选择</option>
+					<option value="3">天</option>
 					<option value="1">分钟</option>
 					<option value="2">小时</option>
-					<option value="3">天</option>
 					<option value="4">月</option>
 				</select>
-			</div>
-		</div>
-		<div class="form-group">
-			<!-- Search input-->
-			<label  class="col-sm-2 control-label" for="minTermsCount">最少出现次数</label>
-			<div class="col-sm-4">
-				<input class="form-control" id="minTermsCount" name="minTermsCount" type="text" placeholder="" />
 			</div>
 		</div>
 		<div class="form-group">
@@ -145,6 +139,7 @@
 			<label  class="col-sm-2 control-label" for="termsCountField">统计字段</label>
 			<div class="col-sm-4">
 				<select  id="termsCountField" name="termsCountField" class="form-control">
+					<option >请选择</option>
 					<option value="uid">用户ID</option>
 					<option value="channel">渠道</option>
 					<option value="terminal">终端</option>
@@ -155,6 +150,14 @@
 				</select>
 			</div>
 		</div>
+		<div class="form-group">
+			<!-- Search input-->
+			<label  class="col-sm-2 control-label" for="minTermsCount">最少出现次数</label>
+			<div class="col-sm-4">
+				<input class="form-control" id="minTermsCount" name="minTermsCount" type="text" placeholder="" />
+			</div>
+		</div>
+
 		<div class="form-group">
 			<div class="col-sm-offset-2 col-sm-4">
 				<input class="form-control" type="button" value="保存" onclick="saveTemplate()" />
