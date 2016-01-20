@@ -50,7 +50,7 @@ function saveDict($tr) {
     if ( !data.type || !data.description ){
         alert('请选择字段类型并填写字段描述');
     }else{
-        $.get(ROOT + '/dict/update',data,function(data){
+        $.post(ROOT + '/dict/update',data,function(data){
             console.debug(data);
             if (data.code == 0) {
                 getDictList();
