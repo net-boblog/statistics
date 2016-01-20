@@ -111,18 +111,18 @@
         <td>?</td>
         <td>
             <div class="center-block" style="width: 150px;">
-                <select name="dictType" id="addDictType" class="form-control">
+                <select name="dictType" class="form-control dictType">
                     <option value="">请选择</option>
-                    <option value="1" {{if dictType=="1" }} selected='selected' {{/if}}>页面</option>
-                    <option value="2" {{if dictType=="2" }} selected='selected' {{/if}}>事件</option>
-                    <option value="3" {{if dictType=="3" }} selected='selected' {{/if}}>渠道</option>
-                    <option value="4" {{if dictType=="4" }} selected='selected' {{/if}}>终端</option>
+                    <option value="1">页面</option>
+                    <option value="2">事件</option>
+                    <option value="3">渠道</option>
+                    <option value="4">终端</option>
                 </select>
             </div>
         </td>
         <td>
             <div class="center-block" style="width: 150px;">
-                <input type="text" id="addDictDesc" class="form-control text-center" placeholder="字段描述"/>
+                <input type="text" class="form-control text-center dictDesc" placeholder="字段描述"/>
             </div>
         </td>
         <td>
@@ -130,18 +130,18 @@
         </td>
     </tr>
   {{each list as item}}
-    <tr>
+    <tr data-id="{{ item.id}}" data-type="{{ item.type}}" data-description="{{ item.description}}">
       <td>{{ item.id}}</td>
       <td>{{ item.type | filterDictType }}</td>
       <td>{{ item.description }}</td>
-      <td><button class="btn btn-greyPurple editDict" data-id="{{ item.id}}">编辑</button></td>
+      <td><button class="btn btn-greyPurple editDict">编辑</button></td>
     </tr>
   {{/each}}
 </script>
 
 <script type="text/html" id="selectTemp">
-    <div class="form-group">
-        <select name="dictType" class="form-control">
+    <div class="center-block" style="width: 150px;">
+        <select name="dictType" class="form-control dictType">
             <option value="">请选择</option>
             <option value="1" {{if dictType=="1" }} selected='selected' {{/if}}>页面</option>
             <option value="2" {{if dictType=="2" }} selected='selected' {{/if}}>事件</option>
@@ -150,6 +150,12 @@
         </select>
     </div>
 </script>
+<script type="text/html" id="inputTemp">
+    <div class="center-block" style="width: 150px;">
+        <input type="text" class="form-control text-center dictDesc" placeholder="字段描述" value="{{ dictDesc }}"/>
+    </div>
+</script>
+
 <script type="text/html" id="templateTemp">
      <div class="form-group" style="display: none">
        <label  class="col-sm-2 control-label" for="id">ID</label>

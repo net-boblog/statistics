@@ -18,24 +18,39 @@ $(function(){
     });
     $(document.body).on('click','.addDict',function(e){
         var tar= $(e.currentTarget).parents('tr');
-        saveDict(tar[0]);
+        saveDict(tar);
+    });
+    $(document.body).on('click','.editDict',function(e){
+        var tar= $(e.currentTarget).parents('tr');
+        editDict(tar);
     });
     checkHash();
 })
 
+function editDict($tr){
+    var selecttemp = template('selectTemp',{dictType:$tr.data('type')});
+    var inputtemp = template('inputTemp',{dictDesc:$tr.data('description')});
+    $tr.find('td').eq(1).html(selecttemp)
+        .next().html(inputtemp)
+        .next().find('button').removeClass('btn-greyPurple editDict').addClass('btn-primary addDict').html('保存');
+}
 function saveDict($tr) {
     var data = {};
-    data.type = $tr.find('#addDictType').value;
-    data.description = $tr.find('#addDictDesc').value;
+    data.type = $tr.find('.dictType').val();
+    data.description = $tr.find('.dictDesc').val();
+    if ($tr.data('id')){
+        data.id = $tr.data('id');
+    }
 
-    if ( data.type || data.description ){
+    if ( !data.type || !data.description ){
+        alert('请选择字段类型并填写字段描述');
+    }else{
         $.get(ROOT + '/dict/update',data,function(data){
             console.debug(data);
             if (data.code == 0) {
                 getDictList();
             }
         },'json');
-    }else{
     }
 }
 function getDictList(){
