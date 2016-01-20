@@ -1,7 +1,5 @@
 package com.xiaoluo.statistics.vo;
 
-import java.util.List;
-
 /**
  * Created by Caedmon on 2016/1/18.
  */
@@ -10,7 +8,6 @@ public class SearchStatResult {
     private long pv;
     private double uv;
     private double ip;
-    private List<TermsResult> termsResults;
     private String from;
     private String to;
     public long getPv() {
@@ -47,14 +44,6 @@ public class SearchStatResult {
 
     public String getTo() {
         return to;
-    }
-
-    public List<TermsResult> getTermsResults() {
-        return termsResults;
-    }
-
-    public void setTermsResults(List<TermsResult> termsResults) {
-        this.termsResults = termsResults;
     }
 
     public void setTo(String to) {

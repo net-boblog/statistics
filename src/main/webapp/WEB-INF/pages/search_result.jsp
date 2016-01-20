@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <html>
 <head>
@@ -67,5 +68,37 @@
 </head>
 <body>
 <div id="container" style="min-width: 310px; height: 600px; margin: 0 auto"></div>
+总PV:${totalPv}
+总UV:${totalUv}
+总IP:${totalIp}
+<table id="termsTable" class="table table-bordered">
+    <thead>
+    <tr>
+        <td>
+            <c:if test="${termsCountField=='uid'}">用户ID标识</c:if>
+            <c:if test="${termsCountField=='event'}">事件</c:if>
+            <c:if test="${termsCountField=='channel'}">渠道</c:if>
+            <c:if test="${termsCountField=='prefix_page'}">来源页</c:if>
+            <c:if test="${termsCountField=='current_page'}">停留页</c:if>
+            <c:if test="${termsCountField=='key_word'}">关键字</c:if>
+            <c:if test="${termsCountField=='terminal'}">终端</c:if>
+            <c:if test="${termsCountField=='version'}">版本号</c:if>
+        </td>
+        <td>计数</td>
+    </tr>
+    </thead>
+    <tbody>
+        <c:forEach items="${termsResult}" var="result">
+            <tr>
+                <td>
+                    ${result.key}
+                </td>
+                <td>
+                    ${result.count}
+                </td>
+            </tr>
+        </c:forEach>
+
+    </tbody>
 </body>
 </html>
