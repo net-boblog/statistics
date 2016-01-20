@@ -61,7 +61,7 @@
                     <div class="form-group">
                         <label for="searchDictID" class="col-sm-1 control-label">ID</label>
                         <div class="col-sm-1">
-                            <input type="number" id="searchDictID" class="form-control" name="ids"/>
+                            <input type="text" id="searchDictID" class="form-control" name="ids"/>
                         </div>
                         <label for="searchDictType" class="col-sm-1 control-label">类型</label>
                         <div class="col-sm-2">
@@ -265,31 +265,25 @@
      <div class="form-group">
        <!-- Search input-->
        <label  class="col-sm-2 control-label" for="interval">间隔时间</label>
-       <div class="col-sm-8">
+       <div class="col-sm-2">
          <input class="form-control" id="interval" name="interval" type="text" placeholder="间隔时间" value="{{ interval || 0 }}"/>
        </div>
-     </div>
-     <div class="form-group">
-       <label  class="col-sm-2 control-label" for="unit">间隔时间单位</label>
-       <div class="col-sm-8">
-         <select  id="unit" name="unit" class="form-control">
-           <option value="1" {{if unit=="1" }} selected='selected' {{/if}}>分钟</option>
-           <option value="2" {{if unit=="2" }} selected='selected' {{/if}}>小时</option>
-           <option value="3" {{if unit=="3" }} selected='selected' {{/if}}>天</option>
-           <option value="4" {{if unit=="4" }} selected='selected' {{/if}}>月</option>
-         </select>
-       </div>
-     </div>
-     <div class="form-group">
-       <label  class="col-sm-2 control-label" for="minTermsCount">最少出现次数</label>
-       <div class="col-sm-8">
-         <input class="form-control" id="minTermsCount" name="minTermsCount" type="text" placeholder="" />
-       </div>
+         <label  class="col-sm-3 control-label" for="unit">时间单位</label>
+         <div class="col-sm-2">
+             <select  id="unit" name="unit" class="form-control">
+                 <option value="1" {{if unit=="0" }} selected='selected' {{/if}}>请选择</option>
+                 <option value="1" {{if unit=="1" }} selected='selected' {{/if}}>分钟</option>
+                 <option value="2" {{if unit=="2" }} selected='selected' {{/if}}>小时</option>
+                 <option value="3" {{if unit=="3" }} selected='selected' {{/if}}>天</option>
+                 <option value="4" {{if unit=="4" }} selected='selected' {{/if}}>月</option>
+             </select>
+         </div>
      </div>
      <div class="form-group">
        <label  class="col-sm-2 control-label" for="termsCountField">统计字段</label>
-       <div class="col-sm-8">
+       <div class="col-sm-3">
          <select  id="termsCountField" name="termsCountField" class="form-control">
+             <option value="" {{if termsCountField==''}} selected='selected' {{/if}}>请选择</option>
            <option value="uid" {{if termsCountField=="uid" }} selected='selected' {{/if}}>用户ID</option>
            <option value="channel" {{if termsCountField=="channel" }} selected='selected' {{/if}}>渠道</option>
            <option value="terminal" {{if termsCountField=="terminal" }} selected='selected' {{/if}}>终端</option>
@@ -299,6 +293,10 @@
            <option value="key_word" {{if termsCountField=="key_word" }} selected='selected' {{/if}}>关键字</option>
          </select>
        </div>
+         <label  class="col-sm-2 control-label" for="minTermsCount">最小计数</label>
+         <div class="col-sm-3">
+             <input class="form-control" id="minTermsCount" name="minTermsCount" type="text" placeholder="" />
+         </div>
      </div>
      <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">

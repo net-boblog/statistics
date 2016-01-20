@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
  */
 public class AuthInterceptor implements HandlerInterceptor {
 
-    private static final String[] IGNORE_URI = {"/login.jsp", "/login","/dologin","/resources"};
+    private static final String[] IGNORE_URI = {"/login.jsp", "/login","/dologin","/resources","/report/insert"};
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object o) throws Exception {
         boolean flag = false;

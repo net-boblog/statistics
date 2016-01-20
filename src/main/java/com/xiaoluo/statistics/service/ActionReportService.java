@@ -3,6 +3,7 @@ package com.xiaoluo.statistics.service;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xiaoluo.statistics.constant.IdentityType;
+import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.search.ElaticsearchManager;
 import com.xiaoluo.statistics.entity.ActionReport;
 import com.xiaoluo.statistics.entity.FullActionReport;
@@ -65,30 +66,47 @@ public class ActionReportService {
     public static final String  INDEX_NAME="log",TYPE_NAME="action_report";
     private Set<String> bindEventSet=new HashSet<String>();
     private ExecutorService asyncThreadPool= Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+    private static final Set<String> Dict_Field_Set=new HashSet<String>();
+    @Autowired
+    private DictService dictService;
     @PostConstruct
     public void init(){
         elaticsearchClient=elaticsearchManager.getElasticsearchClient();
         for(String bindEvent:bindEvents.split(",")){
             bindEventSet.add(bindEvent);
         }
+        Dict_Field_Set.add("terminal");
+        Dict_Field_Set.add("channel");
+        Dict_Field_Set.add("prefix_page");
+        Dict_Field_Set.add("current_page");
+        Dict_Field_Set.add("event");
     }
     public TotalStatResult search(SearchParams params) throws Exception{
         SearchResponse response= createSearchRequestBuilder(params).get();
         SearchStatResult searchStatResult=buildStatResult(params,response);
-        List<SearchStatResult.TermsResult> termsResults=getTermsResultList(response);
+        List<SearchStatResult.TermsResult> termsResults=getTermsResultList(params.getTermsCountField(),response);
         TotalStatResult totalStatResult=new TotalStatResult();
         totalStatResult.setTotalStatResult(searchStatResult);
         totalStatResult.setTermsResults(termsResults);
         return totalStatResult;
     }
-    private List<SearchStatResult.TermsResult> getTermsResultList(SearchResponse searchResponse){
+    private List<SearchStatResult.TermsResult> getTermsResultList(String termsField,SearchResponse searchResponse){
         List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
-        for(Terms.Bucket bucket:((StringTerms)searchResponse.getAggregations().getProperty("terms_count")).getBuckets()){
-            SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
-            termsResult.setKey(bucket.getKeyAsString());
-            termsResult.setCount(bucket.getDocCount());
-            termsResults.add(termsResult);
+        if(!StringUtils.isEmpty(termsField)){
+            boolean isDictField=Dict_Field_Set.contains(termsField);
+            for(Terms.Bucket bucket:((StringTerms)searchResponse.getAggregations().getProperty("terms_count")).getBuckets()){
+                SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
+                if(isDictField){
+                    Dict dict=dictService.get(Integer.valueOf(bucket.getKeyAsString()));
+                    termsResult.setKey(dict.getDescription());
+                }else{
+                    termsResult.setKey(bucket.getKeyAsString());
+                }
+                termsResult.setCount(bucket.getDocCount());
+                termsResults.add(termsResult);
+            }
         }
+
         return termsResults;
     }
     public SearchRequestBuilder createSearchRequestBuilder(SearchParams params){

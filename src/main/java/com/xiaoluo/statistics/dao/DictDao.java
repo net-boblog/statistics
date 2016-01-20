@@ -3,12 +3,14 @@ package com.xiaoluo.statistics.dao;
 import com.xiaoluo.statistics.entity.Dict;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.List;
 import java.util.Map;
 
@@ -29,11 +31,23 @@ public class DictDao {
             return dict;
         }
     };
-    public int update(Dict dict){
+    public int update(final Dict dict){
         String sql=null;
         if(dict.getId()==0){
             sql=" INSERT INTO t_dict (type,description) VALUES(?,?)";
-            return jdbcTemplate.update(sql,new Object[]{dict.getType(),dict.getDescription()});
+            KeyHolder keyHolder=new GeneratedKeyHolder();
+            final String insertSql=sql;
+            int i=jdbcTemplate.update(new PreparedStatementCreator() {
+                @Override
+                public PreparedStatement createPreparedStatement(Connection connection) throws SQLException {
+                    PreparedStatement ps = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS);
+                    ps.setObject(1,dict.getType());
+                    ps.setObject(2,dict.getDescription());
+                    return ps;
+                }
+            },keyHolder);
+            dict.setId(keyHolder.getKey().intValue());
+            return i;
         }else{
             sql="UPDATE t_dict SET type=?,description=? WHERE  id=?";
             return jdbcTemplate.update(sql,new Object[]{dict.getType(), dict.getDescription(),dict.getId()});
@@ -57,5 +71,9 @@ public class DictDao {
         }
 
         return jdbcTemplate.query(sql.toString(),rowMapper);
+    }
+    public Dict findOne(int id){
+        String sql="SELECT * FROM t_dict where id= "+id;
+        return jdbcTemplate.queryForObject(sql,rowMapper);
     }
 }
