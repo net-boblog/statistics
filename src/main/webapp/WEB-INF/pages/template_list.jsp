@@ -67,7 +67,7 @@
                         </div>
                         <label for="searchDictType" class="col-sm-1 control-label">类型</label>
                         <div class="col-sm-2">
-                            <select name="dictType" id="searchDictType" class="form-control">
+                            <select name="type" id="searchDictType" class="form-control">
                                 <option value="">请选择</option>
                                 <option value="1">页面</option>
                                 <option value="2">事件</option>
@@ -77,7 +77,7 @@
                         </div>
                         <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
                         <div class="col-sm-2">
-                            <input type="number" id="searchDictDesc" class="form-control" name="description"/>
+                            <input type="text" id="searchDictDesc" class="form-control" name="description"/>
                         </div>
                         <div class="col-sm-2">
                             <button type="button" class="btn btn-primary searchDictBtn">搜索</button>
