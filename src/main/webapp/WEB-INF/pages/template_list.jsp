@@ -59,6 +59,31 @@
 
 
             <div class="tab-pane fade" id="room2">
+                <form class="form-horizontal" id="searchDict">
+                    <div class="form-group">
+                        <label for="searchDictID" class="col-sm-1 control-label">ID</label>
+                        <div class="col-sm-1">
+                            <input type="number" id="searchDictID" class="form-control" name="ids"/>
+                        </div>
+                        <label for="searchDictType" class="col-sm-1 control-label">类型</label>
+                        <div class="col-sm-2">
+                            <select name="dictType" id="searchDictType" class="form-control">
+                                <option value="">请选择</option>
+                                <option value="1">页面</option>
+                                <option value="2">事件</option>
+                                <option value="3">渠道</option>
+                                <option value="4">终端</option>
+                            </select>
+                        </div>
+                        <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
+                        <div class="col-sm-2">
+                            <input type="number" id="searchDictDesc" class="form-control" name="description"/>
+                        </div>
+                        <div class="col-sm-2">
+                            <button type="button" class="btn btn-primary searchDictBtn">搜索</button>
+                        </div>
+                    </div>
+                </form>
 
                 <table class="table table-bordered">
                     <thead>
