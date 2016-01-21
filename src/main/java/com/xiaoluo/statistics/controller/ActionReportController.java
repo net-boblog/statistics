@@ -1,9 +1,12 @@
 package com.xiaoluo.statistics.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.xiaoluo.statistics.entity.FullActionReport;
+import com.xiaoluo.statistics.entity.SearchTemplate;
 import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.service.ActionReportService;
+import com.xiaoluo.statistics.service.SearchTemplateService;
 import com.xiaoluo.statistics.util.DateKit;
 import com.xiaoluo.statistics.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +28,8 @@ import java.util.*;
 public class ActionReportController extends RestBaseController{
     @Autowired
     private ActionReportService actionReportService;
+    @Autowired
+    private SearchTemplateService searchTemplateService;
     @RequestMapping("/multiSearch")
     public @ResponseBody String multiSearch(SearchParams params) throws Exception{
         List<SearchStatResult> list=actionReportService.multiSearch(params);
@@ -76,6 +81,21 @@ public class ActionReportController extends RestBaseController{
             return actionReportService.rebuild().toString();
         }
         return "Auth fail";
+
+    }
+    @RequestMapping("/funnelSearch")
+    public @ResponseBody String funnelSearch(String templateIds){
+        List<SearchParams> searchParamsList=new ArrayList<SearchParams>();
+        for(String templateId:templateIds.split(",")){
+            SearchTemplate template=searchTemplateService.get(Integer.valueOf(templateId));
+            String params=template.getParams();
+            SearchParams searchParams= JSON.parseObject(params,SearchParams.class);
+            searchParams.setFrom(null);
+            searchParams.setTo(null);
+            searchParamsList.add(searchParams);
+
+        }
+        return actionReportService.funnelSearch(searchParamsList).toString();
 
     }
     @RequestMapping(value = "/insert",method = RequestMethod.POST)

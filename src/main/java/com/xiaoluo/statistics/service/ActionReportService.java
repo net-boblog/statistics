@@ -1,7 +1,6 @@
 package com.xiaoluo.statistics.service;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
 import com.xiaoluo.statistics.constant.IdentityType;
 import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.search.ElaticsearchManager;
@@ -39,7 +38,6 @@ import org.elasticsearch.search.aggregations.metrics.cardinality.CardinalityBuil
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
@@ -94,20 +92,42 @@ public class ActionReportService {
         List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
         if(!StringUtils.isEmpty(termsField)){
             boolean isDictField=Dict_Field_Set.contains(termsField);
-            for(Terms.Bucket bucket:((StringTerms)searchResponse.getAggregations().getProperty("terms_count")).getBuckets()){
-                SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
-                if(isDictField){
-                    Dict dict=dictService.get(Integer.valueOf(bucket.getKeyAsString()));
-                    termsResult.setKey(dict.getDescription());
-                }else{
-                    termsResult.setKey(bucket.getKeyAsString());
+            StringTerms stringTerms=((StringTerms)searchResponse.getAggregations().getProperty("terms_count"));
+            if(stringTerms!=null){
+                for(Terms.Bucket bucket:stringTerms.getBuckets()){
+                    SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
+                    if(isDictField){
+                        Dict dict=dictService.get(Integer.valueOf(bucket.getKeyAsString()));
+                        termsResult.setKey(dict.getDescription());
+                    }else{
+                        termsResult.setKey(bucket.getKeyAsString());
+                    }
+                    termsResult.setCount(bucket.getDocCount());
+                    termsResults.add(termsResult);
                 }
-                termsResult.setCount(bucket.getDocCount());
-                termsResults.add(termsResult);
             }
+
         }
 
         return termsResults;
+    }
+    public List<Integer> funnelSearch(List<SearchParams> searchParamsList){
+        List<String> uids=new ArrayList<String>();
+        List<SearchStatResult.TermsResult> termsResults=null;
+        List<Integer> funnelResult=new ArrayList<Integer>(searchParamsList.size());
+        for(SearchParams searchParams:searchParamsList){
+            if(termsResults!=null){
+                for(SearchStatResult.TermsResult termsResult:termsResults){
+                    uids.add(termsResult.getKey());
+                }
+                searchParams.setUids(uids);
+            }
+            SearchResponse response=createSearchRequestBuilder(searchParams).get();
+            termsResults=getTermsResultList("uid",response);
+            funnelResult.add(termsResults.size());
+        }
+        return funnelResult;
+
     }
     public SearchRequestBuilder createSearchRequestBuilder(SearchParams params){
         if(params.getFrom()==null){
@@ -126,8 +146,8 @@ public class ActionReportService {
         searchRequestBuilder.setExplain(true);
 
         BoolQueryBuilder query=QueryBuilders.boolQuery();
-        if(!StringUtils.isEmpty(params.getUid())){
-            query.filter(QueryBuilders.matchQuery("uid", params.getUid()));
+        if(!StringUtils.isEmpty(params.getUids())){
+            query.filter(QueryBuilders.termsQuery("uid", params.getUids()));
         }
         //时间
         if(params.getFrom()!=null){

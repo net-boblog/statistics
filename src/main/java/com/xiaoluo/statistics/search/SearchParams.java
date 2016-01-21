@@ -17,7 +17,7 @@ public class SearchParams {
     private String keyWords;
     private int interval;
     private int unit;
-    private String uid;
+    private List<String> uids;
     private int minTermsCount;
     private String termsCountField;
     public enum SearchIntervalUnit{
@@ -121,12 +121,12 @@ public class SearchParams {
         this.unit = unit;
     }
 
-    public String getUid() {
-        return uid;
+    public List<String> getUids() {
+        return uids;
     }
 
-    public void setUid(String uid) {
-        this.uid = uid;
+    public void setUids(List<String> uids) {
+        this.uids = uids;
     }
 
     public int getMinTermsCount() {
@@ -158,7 +158,7 @@ public class SearchParams {
         target.setInterval(src.getInterval());
         target.setUnit(src.getUnit());
         target.setMinTermsCount(src.getMinTermsCount());
-        target.setUid(src.getUid());
+        target.setUids(src.getUids());
         target.setTermsCountField(src.getTermsCountField());
         return target;
     }
