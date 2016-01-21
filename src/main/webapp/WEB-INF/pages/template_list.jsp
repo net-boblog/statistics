@@ -271,7 +271,7 @@
          <label  class="col-sm-3 control-label" for="unit">时间单位</label>
          <div class="col-sm-2">
              <select  id="unit" name="unit" class="form-control">
-                 <option value="1" {{if unit=="0" }} selected='selected' {{/if}}>请选择</option>
+                 <option value="0" {{if unit=="0" }} selected='selected' {{/if}}>请选择</option>
                  <option value="1" {{if unit=="1" }} selected='selected' {{/if}}>分钟</option>
                  <option value="2" {{if unit=="2" }} selected='selected' {{/if}}>小时</option>
                  <option value="3" {{if unit=="3" }} selected='selected' {{/if}}>天</option>
