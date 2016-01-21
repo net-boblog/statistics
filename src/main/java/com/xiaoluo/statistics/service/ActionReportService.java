@@ -82,7 +82,7 @@ public class ActionReportService {
     public TotalStatResult search(SearchParams params) throws Exception{
         SearchResponse response= createSearchRequestBuilder(params).get();
         SearchStatResult searchStatResult=buildStatResult(params,response);
-        List<SearchStatResult.TermsResult> termsResults=getTermsResultList(params.getTermsCountField(),response);
+        List<SearchStatResult.TermsResult> termsResults=getTermsResultList(params.getTermsField(),response);
         TotalStatResult totalStatResult=new TotalStatResult();
         totalStatResult.setTotalStatResult(searchStatResult);
         totalStatResult.setTermsResults(termsResults);
@@ -122,8 +122,9 @@ public class ActionReportService {
                 }
                 searchParams.setUids(uids);
             }
+            searchParams.setTermsField("uid");
             SearchResponse response=createSearchRequestBuilder(searchParams).get();
-            termsResults=getTermsResultList("uid",response);
+            termsResults=getTermsResultList(searchParams.getTermsField(),response);
             funnelResult.add(termsResults.size());
         }
         return funnelResult;
@@ -180,8 +181,8 @@ public class ActionReportService {
         searchRequestBuilder.setQuery(query);
         searchRequestBuilder.addAggregation(new CardinalityBuilder("ip").field("ip"));
         searchRequestBuilder.addAggregation(new CardinalityBuilder("uv").field("uid")).request();
-        if(!StringUtils.isEmpty(params.getTermsCountField())){
-            searchRequestBuilder.addAggregation(new TermsBuilder("terms_count").size(0).field(params.getTermsCountField()).minDocCount(params.getMinTermsCount()));
+        if(!StringUtils.isEmpty(params.getTermsField())){
+            searchRequestBuilder.addAggregation(new TermsBuilder("terms_count").size(0).field(params.getTermsField()).minDocCount(params.getMinTermsCount()));
         }
         return searchRequestBuilder;
     }
@@ -228,17 +229,20 @@ public class ActionReportService {
         asyncThreadPool.execute(task);
 
     }
-    public TotalStatResult search(int templateId,Date from,Date to) throws Exception{
+    public TotalStatResult fullSearch(SearchParams searchParams) throws Exception{
+        TotalStatResult totalStatResult=search(searchParams);
+        List<SearchStatResult> sectionStatResults=multiSearch(searchParams);
+        totalStatResult.setSectionStatResults(sectionStatResults);
+        totalStatResult.setTermsField(searchParams.getTermsField());
+        return totalStatResult;
+    }
+    public TotalStatResult searchByTemplate(int templateId, Date from, Date to) throws Exception{
         SearchTemplate template=searchTemplateService.get(templateId);
         String params=template.getParams();
         SearchParams searchParams=JSON.parseObject(params,SearchParams.class);
         searchParams.setFrom(from);
         searchParams.setTo(to);
-        TotalStatResult totalStatResult=search(searchParams);
-        List<SearchStatResult> sectionStatResults=multiSearch(searchParams);
-        totalStatResult.setSectionStatResults(sectionStatResults);
-        totalStatResult.setTermsCountFiled(searchParams.getTermsCountField());
-        return totalStatResult;
+        return fullSearch(searchParams);
     }
     public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
         MultiSearchRequestBuilder requestBuilder=elaticsearchClient.prepareMultiSearch();

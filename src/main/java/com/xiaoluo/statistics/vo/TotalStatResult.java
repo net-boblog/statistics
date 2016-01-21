@@ -9,7 +9,7 @@ public class TotalStatResult {
     private List<SearchStatResult> sectionStatResults;
     private List<SearchStatResult.TermsResult> termsResults;
     private SearchStatResult totalStatResult;
-    private String termsCountFiled;
+    private String termsField;
     public List<SearchStatResult> getSectionStatResults() {
         return sectionStatResults;
     }
@@ -34,11 +34,11 @@ public class TotalStatResult {
         this.totalStatResult = totalStatResult;
     }
 
-    public String getTermsCountFiled() {
-        return termsCountFiled;
+    public String getTermsField() {
+        return termsField;
     }
 
-    public void setTermsCountFiled(String termsCountFiled) {
-        this.termsCountFiled = termsCountFiled;
+    public void setTermsField(String termsField) {
+        this.termsField = termsField;
     }
 }

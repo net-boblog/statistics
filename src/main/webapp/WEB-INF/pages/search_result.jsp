@@ -75,14 +75,14 @@
     <thead>
     <tr>
         <td>
-            <c:if test="${termsCountField=='uid'}">用户ID标识</c:if>
-            <c:if test="${termsCountField=='event'}">事件</c:if>
-            <c:if test="${termsCountField=='channel'}">渠道</c:if>
-            <c:if test="${termsCountField=='prefix_page'}">来源页</c:if>
-            <c:if test="${termsCountField=='current_page'}">停留页</c:if>
-            <c:if test="${termsCountField=='key_word'}">关键字</c:if>
-            <c:if test="${termsCountField=='terminal'}">终端</c:if>
-            <c:if test="${termsCountField=='version'}">版本号</c:if>
+            <c:if test="${termsField=='uid'}">用户ID标识</c:if>
+            <c:if test="${termsField=='event'}">事件</c:if>
+            <c:if test="${termsField=='channel'}">渠道</c:if>
+            <c:if test="${termsField=='prefix_page'}">来源页</c:if>
+            <c:if test="${termsField=='current_page'}">停留页</c:if>
+            <c:if test="${termsField=='key_word'}">关键字</c:if>
+            <c:if test="${termsField=='terminal'}">终端</c:if>
+            <c:if test="${termsField=='version'}">版本号</c:if>
         </td>
         <td>计数</td>
     </tr>

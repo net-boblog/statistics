@@ -19,7 +19,7 @@ public class SearchParams {
     private int unit;
     private List<String> uids;
     private int minTermsCount;
-    private String termsCountField;
+    private String termsField;
     public enum SearchIntervalUnit{
         MINUTE(1),HOUR(2),DAY(3),MONTH(4);
         public int value;
@@ -137,12 +137,12 @@ public class SearchParams {
         this.minTermsCount = minTermsCount;
     }
 
-    public String getTermsCountField() {
-        return termsCountField;
+    public String getTermsField() {
+        return termsField;
     }
 
-    public void setTermsCountField(String termsCountField) {
-        this.termsCountField = termsCountField;
+    public void setTermsField(String termsField) {
+        this.termsField = termsField;
     }
 
     public static SearchParams copyFrom(SearchParams src){
@@ -159,7 +159,7 @@ public class SearchParams {
         target.setUnit(src.getUnit());
         target.setMinTermsCount(src.getMinTermsCount());
         target.setUids(src.getUids());
-        target.setTermsCountField(src.getTermsCountField());
+        target.setTermsField(src.getTermsField());
         return target;
     }
 

@@ -281,17 +281,17 @@
          </div>
      </div>
      <div class="form-group">
-       <label  class="col-sm-2 control-label" for="termsCountField">统计字段</label>
+       <label  class="col-sm-2 control-label" for="termsField">统计字段</label>
        <div class="col-sm-3">
-         <select  id="termsCountField" name="termsCountField" class="form-control">
-             <option value="" {{if termsCountField==''}} selected='selected' {{/if}}>请选择</option>
-           <option value="uid" {{if termsCountField=="uid" }} selected='selected' {{/if}}>用户ID</option>
-           <option value="channel" {{if termsCountField=="channel" }} selected='selected' {{/if}}>渠道</option>
-           <option value="terminal" {{if termsCountField=="terminal" }} selected='selected' {{/if}}>终端</option>
-           <option value="prefix_page" {{if termsCountField=="prefix_page" }} selected='selected' {{/if}}>来源页</option>
-           <option value="current_page" {{if termsCountField=="current_page" }} selected='selected' {{/if}}>当前页</option>
-           <option value="event" {{if termsCountField=="event" }} selected='selected' {{/if}}>事件</option>
-           <option value="key_word" {{if termsCountField=="key_word" }} selected='selected' {{/if}}>关键字</option>
+         <select  id="termsField" name="termsField" class="form-control">
+             <option value="" {{if termsField==''}} selected='selected' {{/if}}>请选择</option>
+           <option value="uid" {{if termsField=="uid" }} selected='selected' {{/if}}>用户ID</option>
+           <option value="channel" {{if termsField=="channel" }} selected='selected' {{/if}}>渠道</option>
+           <option value="terminal" {{if termsField=="terminal" }} selected='selected' {{/if}}>终端</option>
+           <option value="prefix_page" {{if termsField=="prefix_page" }} selected='selected' {{/if}}>来源页</option>
+           <option value="current_page" {{if termsField=="current_page" }} selected='selected' {{/if}}>当前页</option>
+           <option value="event" {{if termsField=="event" }} selected='selected' {{/if}}>事件</option>
+           <option value="key_word" {{if termsField=="key_word" }} selected='selected' {{/if}}>关键字</option>
          </select>
        </div>
          <label  class="col-sm-2 control-label" for="minTermsCount">最小计数</label>

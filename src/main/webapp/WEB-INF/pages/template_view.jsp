@@ -136,9 +136,9 @@
 		</div>
 		<div class="form-group">
 			<!-- Search input-->
-			<label  class="col-sm-2 control-label" for="termsCountField">统计字段</label>
+			<label  class="col-sm-2 control-label" for="termsField">统计字段</label>
 			<div class="col-sm-4">
-				<select  id="termsCountField" name="termsCountField" class="form-control">
+				<select  id="termsField" name="termsField" class="form-control">
 					<option >请选择</option>
 					<option value="uid">用户ID</option>
 					<option value="channel">渠道</option>
