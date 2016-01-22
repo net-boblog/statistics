@@ -65,52 +65,52 @@
         };
         var loadChannel=function(){
             var chanel_terms_agg=$.parseJSON('${channel_terms_agg}');
-            var channel_terms_key_array=new Array();
-            var channel_terms_count_array=new Array();
+            var channelData=new Array();
             for(var i = 0 ,l = chanel_terms_agg.length; i< l; i++){
-                channel_terms_key_array.push(chanel_terms_agg[i].key);
-                channel_terms_count_array.push(chanel_terms_agg[i].count);
+                var result=new Object();
+                result.name=chanel_terms_agg[i].key;
+                result.y=chanel_terms_agg[i].count;
+
+                channelData.push(result);
             }
             $('#channelContainer').highcharts({
                 chart: {
-                    type: 'column'
+                    plotBackgroundColor: null,
+                    plotBorderWidth: null,
+                    plotShadow: false,
+                    type: 'pie'
                 },
                 title: {
-                    text: '柱状图'
+                    text: '渠道分布'
                 },
                 subtitle: {
-                    text: 'Source: WorldClimate.com'
-                },
-                xAxis: {
-                    categories: channel_terms_key_array,
-                    crosshair: true
-                },
-                yAxis: {
-                    min: 0,
-                    title: {
-                        text: ''
-                    }
+                    text: 'www.xiaoluo.com'
                 },
                 tooltip: {
-                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
-                    footerFormat: '</table>',
-                    shared: true,
-                    useHTML: true
+                    pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
                 },
                 plotOptions: {
-                    column: {
-                        pointPadding: 0.2,
-                        borderWidth: 0
+                    pie: {
+                        allowPointSelect: true,
+                        cursor: 'pointer',
+                        dataLabels: {
+                            enabled: false
+                        },
+                        showInLegend: true
                     }
                 },
-                series: [{
-                    name: '次数',
-                    data: channel_terms_count_array
-                }]
+                series: [
+                    {
+                        name: 'Brands',
+                        colorByPoint: true,
+                        data: channelData
+                    }
+                ]
             });
         };
+        var loadTerminal=function(){
+
+        }
         $(function(){
             loadPvUv();
             loadChannel();
