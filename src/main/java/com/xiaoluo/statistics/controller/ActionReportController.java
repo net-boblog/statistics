@@ -2,10 +2,13 @@ package com.xiaoluo.statistics.controller;
 
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.xiaoluo.statistics.constant.DictType;
+import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.entity.FullActionReport;
 import com.xiaoluo.statistics.entity.SearchTemplate;
 import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.service.ActionReportService;
+import com.xiaoluo.statistics.service.DictService;
 import com.xiaoluo.statistics.service.SearchTemplateService;
 import com.xiaoluo.statistics.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ public class ActionReportController extends RestBaseController{
     private ActionReportService actionReportService;
     @Autowired
     private SearchTemplateService searchTemplateService;
+    @Autowired
+    private DictService dictService;
     @RequestMapping("/multiSearch")
     public @ResponseBody String multiSearch(SearchParams params) throws Exception{
 
@@ -72,6 +77,16 @@ public class ActionReportController extends RestBaseController{
         model.addAttribute("uvs",Arrays.toString(uvs.toArray()));
         model.addAttribute("ips",Arrays.toString(ips.toArray()));
         model.addAttribute("times", Arrays.toString(times.toArray()));
+
+        List<Dict> pages=dictService.find(null, DictType.PAGE.value,null);
+        List<Dict> events=dictService.find(null,DictType.EVENT.value,null);
+        List<Dict> channels=dictService.find(null,DictType.CHANNEL.value,null);
+        List<Dict> terminals=dictService.find(null,DictType.TERMINAL.value,null);
+        model.addAttribute("pages",pages);
+        model.addAttribute("events",events);
+        model.addAttribute("channels",channels);
+        model.addAttribute("terminals",terminals);
+
         return "search_result";
     }
     @RequestMapping("/rebuild")
