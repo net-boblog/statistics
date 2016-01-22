@@ -87,6 +87,8 @@ public class ActionReportController extends RestBaseController{
         model.addAttribute("channels",channels);
         model.addAttribute("terminals",terminals);
 
+        model.addAttribute("templateId",templateId);
+
         return "search_result";
     }
     @RequestMapping("/rebuild")
