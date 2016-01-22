@@ -66,12 +66,12 @@ public class ActionReportController extends RestBaseController{
         model.addAttribute("totalPv",totalStatResult.getTotalStatResult().getPv());
         model.addAttribute("totalUv",totalStatResult.getTotalStatResult().getUv());
         model.addAttribute("totalIp",totalStatResult.getTotalStatResult().getIp());
-        model.addAttribute("termsResult",totalStatResult.getTermsResults());
+        model.addAttribute("termsAggMap",totalStatResult.getTermsResultsMap());
+        model.addAttribute("channel_terms_agg",JSON.toJSONString(totalStatResult.getTermsResultsMap().get("channel")));
         model.addAttribute("pvs",Arrays.toString(pvs.toArray()));
         model.addAttribute("uvs",Arrays.toString(uvs.toArray()));
         model.addAttribute("ips",Arrays.toString(ips.toArray()));
         model.addAttribute("times", Arrays.toString(times.toArray()));
-        model.addAttribute("termsField",totalStatResult.getTermsField());
         return "search_result";
     }
     @RequestMapping("/rebuild")

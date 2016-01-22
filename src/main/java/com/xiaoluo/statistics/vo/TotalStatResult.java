@@ -1,15 +1,16 @@
 package com.xiaoluo.statistics.vo;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Caedmon on 2016/1/19.
  */
 public class TotalStatResult {
     private List<SearchStatResult> sectionStatResults;
-    private List<SearchStatResult.TermsResult> termsResults;
+    private Map<String,List<SearchStatResult.TermsResult>> termsResultsMap;
     private SearchStatResult totalStatResult;
-    private String termsField;
+
     public List<SearchStatResult> getSectionStatResults() {
         return sectionStatResults;
     }
@@ -18,12 +19,12 @@ public class TotalStatResult {
         this.sectionStatResults = sectionStatResults;
     }
 
-    public List<SearchStatResult.TermsResult> getTermsResults() {
-        return termsResults;
+    public Map<String, List<SearchStatResult.TermsResult>> getTermsResultsMap() {
+        return termsResultsMap;
     }
 
-    public void setTermsResults(List<SearchStatResult.TermsResult> termsResults) {
-        this.termsResults = termsResults;
+    public void setTermsResultsMap(Map<String, List<SearchStatResult.TermsResult>> termsResultsMap) {
+        this.termsResultsMap = termsResultsMap;
     }
 
     public SearchStatResult getTotalStatResult() {
@@ -32,13 +33,5 @@ public class TotalStatResult {
 
     public void setTotalStatResult(SearchStatResult totalStatResult) {
         this.totalStatResult = totalStatResult;
-    }
-
-    public String getTermsField() {
-        return termsField;
-    }
-
-    public void setTermsField(String termsField) {
-        this.termsField = termsField;
     }
 }

@@ -65,51 +65,58 @@ public class ActionReportService {
     private Set<String> bindEventSet=new HashSet<String>();
     private ExecutorService asyncThreadPool= Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     private static final Set<String> Dict_Field_Set=new HashSet<String>();
+    private static final Map<String,String> Terms_Agg_Name_Set=new HashMap<String,String>();
     @Autowired
     private DictService dictService;
+    private static final String UID_TERMS_AGG_NAME="uid_terms_agg",
+            CHANNEL_TERMS_AGG_NAME="channel_terms_agg",
+            PREFIX_PAGE_TERMS_AGG_NAME="prefix_page_terms_agg",
+            CURRENT_PAGE_TERMS_AGG_NAME="current_page_terms_agg",
+            KEY_WORD_TERMS_AGG_NAME="key_word_terms_agg",
+            EVENT_TERMS_AGG_NAME="event_terms_agg",
+            TERMINAL_TERMS_AGG_NAME="terminal_terms_agg";
     @PostConstruct
     public void init(){
         elaticsearchClient=elaticsearchManager.getElasticsearchClient();
         for(String bindEvent:bindEvents.split(",")){
             bindEventSet.add(bindEvent);
         }
-        Dict_Field_Set.add("terminal");
-        Dict_Field_Set.add("channel");
-        Dict_Field_Set.add("prefix_page");
-        Dict_Field_Set.add("current_page");
-        Dict_Field_Set.add("event");
+        Terms_Agg_Name_Set.put("uid",UID_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put("channel",CHANNEL_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put("prefix_page",PREFIX_PAGE_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put("current_page",CURRENT_PAGE_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put("key_word",KEY_WORD_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put("event",EVENT_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put("terminal",TERMINAL_TERMS_AGG_NAME);
     }
     public TotalStatResult search(SearchParams params) throws Exception{
         SearchResponse response= createSearchRequestBuilder(params).get();
         SearchStatResult searchStatResult=buildStatResult(params,response);
-        List<SearchStatResult.TermsResult> termsResults=getTermsResultList(params.getTermsField(),response);
+        Map<String,List<SearchStatResult.TermsResult>> termsResultsMap= getTermsAggResult(response);
         TotalStatResult totalStatResult=new TotalStatResult();
         totalStatResult.setTotalStatResult(searchStatResult);
-        totalStatResult.setTermsResults(termsResults);
+        totalStatResult.setTermsResultsMap(termsResultsMap);
         return totalStatResult;
     }
-    private List<SearchStatResult.TermsResult> getTermsResultList(String termsField,SearchResponse searchResponse){
-        List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
-        if(!StringUtils.isEmpty(termsField)){
-            boolean isDictField=Dict_Field_Set.contains(termsField);
-            StringTerms stringTerms=((StringTerms)searchResponse.getAggregations().getProperty("terms_count"));
-            if(stringTerms!=null){
-                for(Terms.Bucket bucket:stringTerms.getBuckets()){
-                    SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
-                    if(isDictField){
-                        Dict dict=dictService.get(Integer.valueOf(bucket.getKeyAsString()));
-                        termsResult.setKey(dict.getDescription());
-                    }else{
-                        termsResult.setKey(bucket.getKeyAsString());
-                    }
-                    termsResult.setCount(bucket.getDocCount());
-                    termsResults.add(termsResult);
+    private Map<String,List<SearchStatResult.TermsResult>> getTermsAggResult(SearchResponse searchResponse){
+        Map<String,List<SearchStatResult.TermsResult>> map=new HashMap<String, List<SearchStatResult.TermsResult>>();
+        for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
+            List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
+            StringTerms termsAgg=((StringTerms)searchResponse.getAggregations().getProperty(entry.getValue()));
+            for(Terms.Bucket bucket:termsAgg.getBuckets()){
+                SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
+                if(!entry.getKey().equals("uid")&&!entry.getKey().equals("key_word")){
+                    Dict dict=dictService.get(Integer.valueOf(bucket.getKeyAsString()));
+                    termsResult.setKey(dict.getDescription());
+                }else{
+                    termsResult.setKey(bucket.getKeyAsString());
                 }
+                termsResult.setCount(bucket.getDocCount());
+                termsResults.add(termsResult);
             }
-
+            map.put(entry.getKey(),termsResults);
         }
-
-        return termsResults;
+        return map;
     }
     public List<Integer> funnelSearch(List<SearchParams> searchParamsList){
         List<String> uids=new ArrayList<String>();
@@ -122,9 +129,8 @@ public class ActionReportService {
                 }
                 searchParams.setUids(uids);
             }
-            searchParams.setTermsField("uid");
             SearchResponse response=createSearchRequestBuilder(searchParams).get();
-            termsResults=getTermsResultList(searchParams.getTermsField(),response);
+            termsResults= getTermsAggResult(response).get("uid");
             funnelResult.add(termsResults.size());
         }
         return funnelResult;
@@ -181,8 +187,8 @@ public class ActionReportService {
         searchRequestBuilder.setQuery(query);
         searchRequestBuilder.addAggregation(new CardinalityBuilder("ip").field("ip"));
         searchRequestBuilder.addAggregation(new CardinalityBuilder("uv").field("uid")).request();
-        if(!StringUtils.isEmpty(params.getTermsField())){
-            searchRequestBuilder.addAggregation(new TermsBuilder("terms_count").size(0).field(params.getTermsField()).minDocCount(params.getMinTermsCount()));
+        for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
+            searchRequestBuilder.addAggregation(new TermsBuilder(entry.getValue()).size(0).field(entry.getKey()).minDocCount(1));
         }
         return searchRequestBuilder;
     }
@@ -233,7 +239,6 @@ public class ActionReportService {
         TotalStatResult totalStatResult=search(searchParams);
         List<SearchStatResult> sectionStatResults=multiSearch(searchParams);
         totalStatResult.setSectionStatResults(sectionStatResults);
-        totalStatResult.setTermsField(searchParams.getTermsField());
         return totalStatResult;
     }
     public TotalStatResult searchByTemplate(int templateId, Date from, Date to) throws Exception{

@@ -281,25 +281,6 @@
          </div>
      </div>
      <div class="form-group">
-       <label  class="col-sm-2 control-label" for="termsField">统计字段</label>
-       <div class="col-sm-3">
-         <select  id="termsField" name="termsField" class="form-control">
-             <option value="" {{if termsField==''}} selected='selected' {{/if}}>请选择</option>
-           <option value="uid" {{if termsField=="uid" }} selected='selected' {{/if}}>用户ID</option>
-           <option value="channel" {{if termsField=="channel" }} selected='selected' {{/if}}>渠道</option>
-           <option value="terminal" {{if termsField=="terminal" }} selected='selected' {{/if}}>终端</option>
-           <option value="prefix_page" {{if termsField=="prefix_page" }} selected='selected' {{/if}}>来源页</option>
-           <option value="current_page" {{if termsField=="current_page" }} selected='selected' {{/if}}>当前页</option>
-           <option value="event" {{if termsField=="event" }} selected='selected' {{/if}}>事件</option>
-           <option value="key_word" {{if termsField=="key_word" }} selected='selected' {{/if}}>关键字</option>
-         </select>
-       </div>
-         <label  class="col-sm-2 control-label" for="minTermsCount">最小计数</label>
-         <div class="col-sm-3">
-             <input class="form-control" id="minTermsCount" name="minTermsCount" type="text" placeholder="" />
-         </div>
-     </div>
-     <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">
          <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />
        </div>
