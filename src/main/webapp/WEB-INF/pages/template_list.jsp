@@ -290,8 +290,6 @@
     <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
     <script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
     <script src="${ctx}/resources/js/art-template.js"></script>
-    <script src="${ctx}/resources/js/layer/layer.js"></script>
-    <script src="${ctx}/resources/js/URI.min.js"></script>
     <script src="${ctx}/resources/js/common.js"></script>
     <script src="${ctx}/resources/js/list.js"></script>
 </body>
