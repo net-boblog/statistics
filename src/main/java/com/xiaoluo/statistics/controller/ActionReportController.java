@@ -76,10 +76,7 @@ public class ActionReportController extends RestBaseController{
     }
     @RequestMapping("/rebuild")
     public @ResponseBody String rebuild(HttpServletRequest request) throws Exception{
-        if(request.getRemoteHost().endsWith("localhost")||request.getRemoteHost().endsWith("127.0.0.1")){
-            return actionReportService.rebuild().toString();
-        }
-        return "Auth fail";
+        return actionReportService.rebuild().toString();
 
     }
     @RequestMapping("/funnelSearch")
