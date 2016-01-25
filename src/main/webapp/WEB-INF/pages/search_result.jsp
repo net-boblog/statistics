@@ -6,7 +6,7 @@
     <meta http-equiv="Content-Type" params="text/html; charset=utf-8">
     <title>日志统计系统</title>
     <link rel="stylesheet" href="${ctx}/resources/css/bootstrap.min.css">
-    <link rel="stylesheet" href="${ctx}/resources/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="${ctx}/resources/css/zxx.lib.css">
     <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
     <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery.form.js"></script>
     <script src="//cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
@@ -164,14 +164,14 @@
                                 <c:if test="${termsAggEntry.key=='terminal'}">终端</c:if>
                                 <c:if test="${termsAggEntry.key=='version'}">版本号</c:if>
                             </td>
-                            <td>计数</td>
+                            <td class="w200">计数</td>
                         </tr>
                         </thead>
                         <tbody>
                         <c:forEach items="${termsAggEntry.value}" var="result">
                             <tr>
                                 <td>${result.key}</td>
-                                <td>${result.count}</td>
+                                <td class="w200">${result.count}</td>
                             </tr>
                         </c:forEach>
 
@@ -284,7 +284,7 @@
     </div>
     <div class="form-group">
         <div class="col-sm-offset-2 col-sm-4">
-            <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />
+            <input class="btn btn-block btn-primary saveTemplate" type="button" value="查询" />
         </div>
     </div>
 </script>
@@ -293,6 +293,10 @@
 <script>
     var templateId = '${templateId}';
     var ROOT = '${ctx}';
+    $(document.body).on('click','.saveTemplate',function(e){
+        var form = $(e.currentTarget).parents('form')[0];
+        saveTemp(form);
+    })
     $(function(){
         getTemplate(templateId);
     })
@@ -315,7 +319,7 @@
 
                     for (var n=arr.length-1 ; n>=0 ; n--) {
                         if (params[arr[n]]){
-                            var checkboxs = form.find('[name="'+arr[n]+'"]');
+                            var checkboxs = $('#updateForm').find('[name="'+arr[n]+'"]');
                             for(var i=params[arr[n]].length-1 ; i>=0 ;i--){
                                 checkboxs.filter('[value="'+params[arr[n]][i]+'"]').attr('checked','checked');
                             }
@@ -329,6 +333,52 @@
         }else{
             $('#updateForm').html(template('templateTemp',{}));
         }
+    }
+
+    function saveTemp ( form ) {
+
+            var data = {};
+            var	items = form.elements;
+
+            for ( var i=items.length-1 ; i>=0 ; i--) {
+                var item = items[i];
+                var value = item.value, name = item.name;
+                if (!name || !value) {
+                    continue ;
+                }
+                if (data[name] !== undefined) {
+                    if (!data[name].push) {//如果不是数组则转化成数组
+                        data[name] = [data[name]];
+                    }
+                    data[name].push(value || '');
+                } else if (item.type.toLowerCase() == 'checkbox' ) {
+                    if ( item.checked ){
+
+                        data[name] = [value] || [];
+                    }
+                } else if (item.type.toLowerCase() == 'radiobox' ) {
+                    if ( item.checked ) {
+
+                        data[name] = value || '';
+                    }
+                } else {
+                    data[name] = value || '';
+                }
+            }
+            $.ajax({
+                url:ROOT + "/template/update",
+                data:"data="+JSON.stringify(data),
+                type:'POST',
+                error:function(e){
+                    $.alert(e);
+                },
+                success:function(){
+                    $.alert('模板已修改，正在为您查询...','primary');
+                    setTimeout(function(){
+                        location.reload();
+                    },1000);
+                }
+            })
     }
 
 </script>
