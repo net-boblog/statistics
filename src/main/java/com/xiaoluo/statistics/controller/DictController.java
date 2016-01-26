@@ -18,10 +18,18 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class DictController extends RestBaseController{
     @Autowired
     private DictService dictService;
-    @RequestMapping("/update")
-    public @ResponseBody String update(Dict dict){
+    @RequestMapping("/insert")
+    public @ResponseBody String insert(Dict dict){
         ApiResult result=new ApiResult();
-        if(dictService.update(dict)<1){
+        if(dictService.insert(dict)<1){
+            result.setCode(StatErrorCode.UPDATE_FAIL);
+        }
+        return result.toString();
+    }
+    @RequestMapping("/update")
+    public @ResponseBody String update(String id,String description){
+        ApiResult result=new ApiResult();
+        if(dictService.update(id,description)<1){
             result.setCode(StatErrorCode.UPDATE_FAIL);
         }
         return result.toString();

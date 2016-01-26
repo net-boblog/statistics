@@ -1,5 +1,7 @@
 package com.xiaoluo.statistics.entity;
 
+import java.util.Map;
+
 /**
  * Created by Caedmon on 2015/12/24.
  */
@@ -10,7 +12,7 @@ public class ActionReport {
     private String channel;
     private String terminal;
     private String event;
-    private String key_word;
+    private Map<String,String> extra;
     private long time;
     private String ip;
     private String version;
@@ -70,12 +72,12 @@ public class ActionReport {
         this.event = event;
     }
 
-    public String getKey_word() {
-        return key_word;
+    public Map<String, String> getExtra() {
+        return extra;
     }
 
-    public void setKey_word(String key_word) {
-        this.key_word = key_word;
+    public void setExtra(Map<String, String> extra) {
+        this.extra = extra;
     }
 
     public String getIp() {

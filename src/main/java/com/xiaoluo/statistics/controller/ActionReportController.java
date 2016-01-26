@@ -35,25 +35,10 @@ public class ActionReportController extends RestBaseController{
     @Autowired
     private DictService dictService;
     @RequestMapping("/multiSearch")
-    public @ResponseBody String multiSearch(SearchParams params) throws Exception{
+    public @ResponseBody String multiSearch(String data) throws Exception{
+        SearchParams params=JSON.parseObject(data,SearchParams.class);
 
-        List<SearchStatResult> list=actionReportService.multiSearch(params);
-        List<Long> pvs=new ArrayList<Long>();
-        List<Double> uvs=new ArrayList<Double>();
-        List<Double> ips=new ArrayList<Double>();
-        List<String> times=new ArrayList<String>();
-        for(SearchStatResult result:list){
-            pvs.add(result.getPv());
-            uvs.add(result.getUv());
-            ips.add(result.getIp());
-            times.add("\""+result.getTo()+"\"");
-        }
-        JSONObject jsonObject=new JSONObject();
-        jsonObject.put("pvs", Arrays.toString(pvs.toArray()));
-        jsonObject.put("uvs",Arrays.toString(uvs.toArray()));
-        jsonObject.put("ips",Arrays.toString(ips.toArray()));
-        jsonObject.put("times", Arrays.toString(times.toArray()));
-        return jsonObject.toJSONString();
+        return JSON.toJSONString(actionReportService.fullSearch(params));
     }
     @RequestMapping("/searchByTemplate")
     public String searchByTemplate(Model model,int templateId, @RequestParam(required = false) Date from, @RequestParam (required = false)Date to) throws Exception{
@@ -78,7 +63,7 @@ public class ActionReportController extends RestBaseController{
         model.addAttribute("ips",Arrays.toString(ips.toArray()));
         model.addAttribute("times", Arrays.toString(times.toArray()));
 
-        List<Dict> pages=dictService.find(null, DictType.PAGE.value,null);
+        List<Dict> pages=dictService.find(null,DictType.PAGE.value,null);
         List<Dict> events=dictService.find(null,DictType.EVENT.value,null);
         List<Dict> channels=dictService.find(null,DictType.CHANNEL.value,null);
         List<Dict> terminals=dictService.find(null,DictType.TERMINAL.value,null);
@@ -112,8 +97,24 @@ public class ActionReportController extends RestBaseController{
 
     }
     @RequestMapping(value = "/insert",method = RequestMethod.POST)
-    public @ResponseBody String insert(FullActionReport report) throws Exception{
+    public @ResponseBody String insert(String report) throws Exception{
         actionReportService.insert(report);
         return "OK";
+    }
+
+    public static void main(String[] args) {
+        FullActionReport report=new FullActionReport();
+        report.setIdentity_type("pc_cookie");
+        report.setIdentity_value("UKAcFc5y1g8Br537WKcAS");
+        report.setPrefix_page("1");
+        report.setCurrent_page("2");
+        report.setChannel("1");
+        report.setTerminal("ios");
+
+        Map<String,String> extra=new HashMap<String, String>();
+        extra.put("p1","test1");
+        extra.put("p2","test2");
+        report.setExtra(extra);
+        System.out.println(JSON.toJSONString(report));
     }
 }

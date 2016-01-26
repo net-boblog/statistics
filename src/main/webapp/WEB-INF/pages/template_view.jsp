@@ -146,7 +146,7 @@
 					<option value="prefix_page">来源页</option>
 					<option value="current_page">当前页</option>
 					<option value="event">事件</option>
-					<option value="key_word">关键字</option>
+					<option value="extra">关键字</option>
 				</select>
 			</div>
 		</div>

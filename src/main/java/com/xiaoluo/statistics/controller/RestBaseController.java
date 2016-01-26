@@ -8,6 +8,7 @@ import com.xl.rpc.exception.RemoteException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.beans.propertyeditors.CustomMapEditor;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
@@ -17,6 +18,8 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -30,7 +33,9 @@ public class RestBaseController {
         request.setCharacterEncoding("UTF-8");
         SimpleDateFormat format=new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         CustomDateEditor editor=new CustomDateEditor(format,true);
+        CustomMapEditor mapEditor=new CustomMapEditor(HashMap.class);
         binder.registerCustomEditor(Date.class, editor);
+        binder.registerCustomEditor(Map.class,mapEditor);
     }
     @ExceptionHandler
     public @ResponseBody

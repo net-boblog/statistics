@@ -4,10 +4,9 @@ package com.xiaoluo.statistics.entity;
  * Created by Administrator on 2016/1/19.
  */
 public class Dict {
-    private int id;
+    private String id;
     private int type;
     private String description;
-
     public int getType() {
         return type;
     }
@@ -25,11 +24,11 @@ public class Dict {
         this.description = value;
     }
 
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 }

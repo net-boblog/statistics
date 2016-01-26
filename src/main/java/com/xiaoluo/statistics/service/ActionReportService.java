@@ -1,6 +1,7 @@
 package com.xiaoluo.statistics.service;
 
 import com.alibaba.fastjson.JSON;
+import com.xiaoluo.statistics.constant.DictType;
 import com.xiaoluo.statistics.constant.IdentityType;
 import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.search.ElaticsearchManager;
@@ -28,9 +29,15 @@ import org.elasticsearch.cluster.metadata.IndexMetaData;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.NestedQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.Aggregation;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregator;
+import org.elasticsearch.search.aggregations.bucket.nested.NestedBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsBuilder;
@@ -72,22 +79,31 @@ public class ActionReportService {
             CHANNEL_TERMS_AGG_NAME="channel_terms_agg",
             PREFIX_PAGE_TERMS_AGG_NAME="prefix_page_terms_agg",
             CURRENT_PAGE_TERMS_AGG_NAME="current_page_terms_agg",
-            KEY_WORD_TERMS_AGG_NAME="key_word_terms_agg",
+            EXTRA_TERMS_AGG_NAME ="extra_terms_agg",
             EVENT_TERMS_AGG_NAME="event_terms_agg",
             TERMINAL_TERMS_AGG_NAME="terminal_terms_agg";
+    private static final String UID_FIELD_NAME="uid",
+            CHANNEL_FIELD_NAME="channel",
+            PREFIX_PAGE_FIELD_NAME="prefix_page",
+            CURRENT_PAGE_FIELD_NAME="current_page",
+            EXTRA_FIELD_NAME="extra",
+            EVENT_FIELD_NAME="event",
+            TIME_FIELD_NAME="time",
+            TERMINAL_FIELD_NAME="terminal",
+            IP_FIELD_NAME="ip",
+            VERSION_FIELD_NAME="version";
     @PostConstruct
     public void init(){
         elaticsearchClient=elaticsearchManager.getElasticsearchClient();
         for(String bindEvent:bindEvents.split(",")){
             bindEventSet.add(bindEvent);
         }
-        Terms_Agg_Name_Set.put("uid",UID_TERMS_AGG_NAME);
-        Terms_Agg_Name_Set.put("channel",CHANNEL_TERMS_AGG_NAME);
-        Terms_Agg_Name_Set.put("prefix_page",PREFIX_PAGE_TERMS_AGG_NAME);
-        Terms_Agg_Name_Set.put("current_page",CURRENT_PAGE_TERMS_AGG_NAME);
-        Terms_Agg_Name_Set.put("key_word",KEY_WORD_TERMS_AGG_NAME);
-        Terms_Agg_Name_Set.put("event",EVENT_TERMS_AGG_NAME);
-        Terms_Agg_Name_Set.put("terminal",TERMINAL_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put(UID_FIELD_NAME,UID_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put(CHANNEL_FIELD_NAME,CHANNEL_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put(PREFIX_PAGE_FIELD_NAME,PREFIX_PAGE_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put(CURRENT_PAGE_FIELD_NAME,CURRENT_PAGE_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put(EVENT_FIELD_NAME,EVENT_TERMS_AGG_NAME);
+        Terms_Agg_Name_Set.put(TERMINAL_FIELD_NAME,TERMINAL_TERMS_AGG_NAME);
     }
     public TotalStatResult search(SearchParams params) throws Exception{
         SearchResponse response= createSearchRequestBuilder(params).get();
@@ -98,23 +114,31 @@ public class ActionReportService {
         totalStatResult.setTermsResultsMap(termsResultsMap);
         return totalStatResult;
     }
+    private List<SearchStatResult.TermsResult> buildTermsResultList(StringTerms termsAgg){
+        List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
+        String aggName=termsAgg.getName();
+        for(Terms.Bucket bucket:termsAgg.getBuckets()){
+            SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
+            if(!aggName.equals(UID_TERMS_AGG_NAME)&&!aggName.equals(EXTRA_TERMS_AGG_NAME)){
+                Dict dict=dictService.get(bucket.getKeyAsString());
+                termsResult.setKey(dict.getDescription());
+            }else{
+                termsResult.setKey(bucket.getKeyAsString());
+            }
+            termsResult.setCount(bucket.getDocCount());
+            termsResults.add(termsResult);
+        }
+        return termsResults;
+    }
     private Map<String,List<SearchStatResult.TermsResult>> getTermsAggResult(SearchResponse searchResponse){
         Map<String,List<SearchStatResult.TermsResult>> map=new HashMap<String, List<SearchStatResult.TermsResult>>();
-        for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
-            List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
-            StringTerms termsAgg=((StringTerms)searchResponse.getAggregations().getProperty(entry.getValue()));
-            for(Terms.Bucket bucket:termsAgg.getBuckets()){
-                SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
-                if(!entry.getKey().equals("uid")&&!entry.getKey().equals("key_word")){
-                    Dict dict=dictService.get(Integer.valueOf(bucket.getKeyAsString()));
-                    termsResult.setKey(dict.getDescription());
-                }else{
-                    termsResult.setKey(bucket.getKeyAsString());
-                }
-                termsResult.setCount(bucket.getDocCount());
-                termsResults.add(termsResult);
+        for(Aggregation aggregation:searchResponse.getAggregations().asMap().values()){
+            if(aggregation instanceof StringTerms){
+                List<SearchStatResult.TermsResult> termsResultList=buildTermsResultList((StringTerms) aggregation);
+                map.put(aggregation.getName(),termsResultList);
             }
-            map.put(entry.getKey(),termsResults);
+
+
         }
         return map;
     }
@@ -130,7 +154,7 @@ public class ActionReportService {
                 searchParams.setUids(uids);
             }
             SearchResponse response=createSearchRequestBuilder(searchParams).get();
-            termsResults= getTermsAggResult(response).get("uid");
+            termsResults= getTermsAggResult(response).get(UID_FIELD_NAME);
             funnelResult.add(termsResults.size());
         }
         return funnelResult;
@@ -154,39 +178,48 @@ public class ActionReportService {
 
         BoolQueryBuilder query=QueryBuilders.boolQuery();
         if(!StringUtils.isEmpty(params.getUids())){
-            query.filter(QueryBuilders.termsQuery("uid", params.getUids()));
+            query.filter(QueryBuilders.termsQuery(UID_FIELD_NAME, params.getUids()));
         }
         //时间
         if(params.getFrom()!=null){
-            query.filter(QueryBuilders.rangeQuery("time").from(params.getFrom().getTime()));
+            query.filter(QueryBuilders.rangeQuery(TIME_FIELD_NAME).from(params.getFrom().getTime()));
         }
         if(params.getTo()!=null){
-            query.filter(QueryBuilders.rangeQuery("time").to(params.getTo().getTime()));
+            query.filter(QueryBuilders.rangeQuery(TIME_FIELD_NAME).to(params.getTo().getTime()));
         }
         if(params.getChannels()!=null&&!params.getChannels().isEmpty()){
-            query.filter(QueryBuilders.termsQuery("channel", params.getChannels()));
+            query.filter(QueryBuilders.termsQuery(CHANNEL_FIELD_NAME, params.getChannels()));
         }
         if(params.getEvents()!=null&&params.getEvents().size()>0){
-            query.filter(QueryBuilders.termsQuery("event", params.getEvents()));
+            query.filter(QueryBuilders.termsQuery(EVENT_FIELD_NAME, params.getEvents()));
 
         }
-        if(!StringUtils.isEmpty(params.getKeyWords())){
-            String[] keyWords=params.getKeyWords().split(",");
-            query.filter(QueryBuilders.termsQuery("key_word", keyWords));
-        }
+
         if(params.getPrefixPages()!=null&&params.getPrefixPages().size()>0){
-            query.filter(QueryBuilders.termsQuery("prefix_page", params.getPrefixPages()));
+            query.filter(QueryBuilders.termsQuery(PREFIX_PAGE_FIELD_NAME, params.getPrefixPages()));
         }
         if(params.getCurrentPages()!=null&&params.getCurrentPages().size()>0){
-            query.filter(QueryBuilders.termsQuery("current_page", params.getCurrentPages()));
+            query.filter(QueryBuilders.termsQuery(CURRENT_PAGE_FIELD_NAME, params.getCurrentPages()));
         }
         if(params.getTerminals()!=null&&params.getTerminals().size()>0){
-            query.filter(QueryBuilders.termsQuery("terminal", params.getTerminals()));
+            query.filter(QueryBuilders.termsQuery(TERMINAL_FIELD_NAME, params.getTerminals()));
         }
+        if(params.getExtra()!=null){
+            for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
+                TermsQueryBuilder extraTermsQueryBuilder=QueryBuilders.
+                        termsQuery(entry.getKey(),entry.getValue().split(","));
+               query.filter(QueryBuilders.nestedQuery(EXTRA_FIELD_NAME,extraTermsQueryBuilder));
+            }
 
+        }
         searchRequestBuilder.setQuery(query);
-        searchRequestBuilder.addAggregation(new CardinalityBuilder("ip").field("ip"));
-        searchRequestBuilder.addAggregation(new CardinalityBuilder("uv").field("uid")).request();
+        searchRequestBuilder.addAggregation(new CardinalityBuilder("ip").field(IP_FIELD_NAME));
+        searchRequestBuilder.addAggregation(new CardinalityBuilder("uv").field(UID_FIELD_NAME)).request();
+        NestedBuilder extraBuilder=AggregationBuilders.nested(EXTRA_TERMS_AGG_NAME).path(EXTRA_FIELD_NAME);
+        for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
+            extraBuilder.subAggregation(new TermsBuilder(entry.getKey()).size(0).field(EXTRA_FIELD_NAME+"."+entry.getKey()).minDocCount(1));
+        }
+        searchRequestBuilder.addAggregation(extraBuilder);
         for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
             searchRequestBuilder.addAggregation(new TermsBuilder(entry.getValue()).size(0).field(entry.getKey()).minDocCount(1));
         }
@@ -197,7 +230,7 @@ public class ActionReportService {
             @Override
             public void run() {
                 BoolQueryBuilder qb=QueryBuilders.boolQuery();
-                qb.filter(QueryBuilders.termsQuery("uid", oldUids));
+                qb.filter(QueryBuilders.termsQuery(UID_FIELD_NAME, oldUids));
                 SearchResponse scrollResp = elaticsearchClient.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME)
                         .setSearchType(SearchType.SCAN)
                         .setScroll(new TimeValue(60000))
@@ -208,7 +241,7 @@ public class ActionReportService {
                 while (true) {
                     for (SearchHit hit : scrollResp.getHits().getHits()) {
                         UpdateRequestBuilder updateRequestBuilder=elaticsearchClient.prepareUpdate(INDEX_NAME, TYPE_NAME, hit.getId());
-                        updateRequestBuilder.setDoc("uid",newUid);
+                        updateRequestBuilder.setDoc(UID_FIELD_NAME,newUid);
                         bulkRequestBuilder.add(updateRequestBuilder);
 
                     }
@@ -250,6 +283,18 @@ public class ActionReportService {
         return fullSearch(searchParams);
     }
     public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
+        if(params.getFrom()==null){
+            params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
+        }
+        if(params.getTo()==null){
+            params.setTo(new Date());
+        }
+        if(params.getUnit()==0){
+            params.setUnit(SearchParams.SearchIntervalUnit.DAY.value);
+        }
+        if(params.getInterval()==0){
+            params.setInterval(1);
+        }
         MultiSearchRequestBuilder requestBuilder=elaticsearchClient.prepareMultiSearch();
         SearchParams.SearchIntervalUnit unit= SearchParams.SearchIntervalUnit.valueOf(params.getUnit());
         int interval=params.getInterval();
@@ -312,11 +357,32 @@ public class ActionReportService {
         result.setTo(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParams.getTo()));
         return result;
     }
-    public void insert(FullActionReport report) throws Exception{
+    private Dict createIfNotExist(String id,DictType type){
+        if(StringUtils.isEmpty(id)){
+            return null;
+        }
+        Dict dict=dictService.get(id);
+        if(dict==null){
+            dict=new Dict();
+            dict.setId(id);
+            dict.setType(type.value);
+            dict.setDescription(id);
+            dictService.insert(dict);
+        }
+        return dict;
+    }
+    public void insert(String data) throws Exception{
+        FullActionReport report=JSON.parseObject(data,FullActionReport.class);
+        //判断是否存在字典,不存在则自动新增一条
+        createIfNotExist(report.getChannel(),DictType.CHANNEL);
+        createIfNotExist(report.getPrefix_page(),DictType.PAGE);
+        createIfNotExist(report.getCurrent_page(),DictType.PAGE);
+        createIfNotExist(report.getTerminal(),DictType.TERMINAL);
+        createIfNotExist(report.getEvent(),DictType.EVENT);
         //判断事件是否为注册或登录事件
         String uid=null;
         if(this.bindEventSet.contains(report.getEvent())){
-            String phone=report.getKey_word();
+            String phone=report.getExtra().get("p1");
             UserBindResult result=userService.bindUser(phone, IdentityType.valueOf(report.getIdentity_type()), report.getIdentity_value());
             if(result.needUpdate()){
                 updateUid(result.getOldUids(), result.getNewUid());
@@ -348,28 +414,26 @@ public class ActionReportService {
         createRequest.settings(settings);
         CreateIndexResponse createIndexResponse=elaticsearchClient.admin().indices().create(createRequest).actionGet();
         List<String> sources=new ArrayList();
-        sources.add("prefix_page");
+        sources.add(PREFIX_PAGE_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("uid");
+        sources.add(UID_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("current_page");
+        sources.add(CURRENT_PAGE_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("channel");
+        sources.add(CHANNEL_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("terminal");
+        sources.add(TERMINAL_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("event");
+        sources.add(EVENT_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("event");
-        sources.add("type=string,index=not_analyzed");
-        sources.add("key_word");
+        sources.add(EXTRA_FIELD_NAME);
         //sources.add("type=string,index=not_analyzed");
-        sources.add("type=string,analyzer=ik");
-        sources.add("time");
+        sources.add("type=nested");
+        sources.add(TIME_FIELD_NAME);
         sources.add("type=date,format=epoch_millis");
-        sources.add("ip");
+        sources.add(IP_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
-        sources.add("version");
+        sources.add(VERSION_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
         PutMappingRequest putMappingRequest=new PutMappingRequest(INDEX_NAME).type(TYPE_NAME).source(PutMappingRequest.buildFromSimplifiedDef(TYPE_NAME,sources.toArray()));
         PutMappingResponse putMappingResponse=elaticsearchClient.admin().indices().putMapping(putMappingRequest).get();

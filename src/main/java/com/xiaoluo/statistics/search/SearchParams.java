@@ -2,6 +2,7 @@ package com.xiaoluo.statistics.search;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Caedmon on 2015/12/24.
@@ -14,7 +15,7 @@ public class SearchParams {
     private List<String> channels;
     private List<String> terminals;
     private List<String> events;
-    private String keyWords;
+    private Map<String,String> extra;
     private int interval;
     private int unit;
     private List<String> uids;
@@ -95,12 +96,12 @@ public class SearchParams {
         this.events = events;
     }
 
-    public String getKeyWords() {
-        return keyWords;
+    public Map<String, String> getExtra() {
+        return extra;
     }
 
-    public void setKeyWords(String keyWords) {
-        this.keyWords = keyWords;
+    public void setExtra(Map<String, String> extra) {
+        this.extra = extra;
     }
 
     public int getInterval() {
@@ -137,7 +138,7 @@ public class SearchParams {
         target.setChannels(src.getChannels());
         target.setTerminals(src.getTerminals());
         target.setEvents(src.getEvents());
-        target.setKeyWords(src.getKeyWords());
+        target.setExtra(src.getExtra());
         target.setInterval(src.getInterval());
         target.setUnit(src.getUnit());
         target.setUids(src.getUids());

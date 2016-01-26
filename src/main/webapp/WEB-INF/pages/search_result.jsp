@@ -139,7 +139,7 @@
             <ul class="tag-group">
                 <li class="tag tag-default active" data-toggle="tab" data-target="#room1">PV UV IP</li>
                 <li class="tag tag-default" data-toggle="tab" data-target="#room2">渠道统计</li>
-                <li class="tag tag-default" data-toggle="tab" data-target="#room3">字典统计</li>
+                <li class="tag tag-default" data-toggle="tab" data-target="#room3">事件统计</li>
             </ul>
         </div>
         <div class="box-body tab-content">
@@ -160,7 +160,7 @@
                                 <c:if test="${termsAggEntry.key=='channel'}">渠道</c:if>
                                 <c:if test="${termsAggEntry.key=='prefix_page'}">来源页</c:if>
                                 <c:if test="${termsAggEntry.key=='current_page'}">停留页</c:if>
-                                <c:if test="${termsAggEntry.key=='key_word'}">关键字</c:if>
+                                <c:if test="${termsAggEntry.key=='extra'}">关键字</c:if>
                                 <c:if test="${termsAggEntry.key=='terminal'}">终端</c:if>
                                 <c:if test="${termsAggEntry.key=='version'}">版本号</c:if>
                             </td>
