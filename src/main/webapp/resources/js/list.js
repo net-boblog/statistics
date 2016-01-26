@@ -14,6 +14,10 @@ $(function(){
     });
     $(document.body).on('click','.saveTemplate',function(e){
         var tar= $(e.currentTarget).parents('form');
+        if (!tar.find('#name').val()){
+            $.alert('请填写模板名','','#updateForm');
+            return ;
+        }
         saveTemplate(tar[0]);
     });
     $(document.body).on('click','.addDict',function(e){
@@ -28,6 +32,18 @@ $(function(){
         var form= $(e.currentTarget).parents('form');
         var data = form.serialize();
         getDictList(data);
+    });
+    $(document.body).on('click','.addExtra',function(e){
+
+        var obj= $(e.currentTarget).parents('.form-group');
+        if (!obj.find('input').first().val()) {
+            $.alert('请填写附加字段描述','','#updateForm');
+            return ;
+        }
+        addExtra(obj);
+    });
+    $(document.body).on('click','.delExtra',function(e){
+        $(e.currentTarget).parents('.form-group').remove();
     });
     checkHash();
 })
@@ -80,6 +96,7 @@ function editTemplate(id){
             DATA.interval = params.interval || '';
             DATA.termsCountField = params.termsCountField || '';
             DATA.unit = params.unit || '';
+            DATA.extra = params.extra || [];
 
             var form = $('#updateForm');
             form.html(template('templateTemp',DATA));
@@ -110,9 +127,11 @@ function saveTemplate(obj){//obj was a form
     for ( var i=items.length-1 ; i>=0 ; i--) {
         var item = items[i];
         var value = item.value, name = item.name;
+
         if (!name || !value) {
             continue ;
         }
+
         if (data[name] !== undefined) {
             if (!data[name].push) {//如果不是数组则转化成数组
                 data[name] = [data[name]];
@@ -132,6 +151,16 @@ function saveTemplate(obj){//obj was a form
             data[name] = value || '';
         }
     }
+
+    data['extra']=[];
+    $(obj).find('.extra').each(function(index,el){
+       var name = $(el).find('.extraName').val();
+       var value = $(el).find('.extraKey').val();
+        if (name){
+            data.extra.push({name:name,value:value});
+        }
+    });
+
     $.ajax({
         url:ROOT + "/template/update",
         data:"data="+JSON.stringify(data),
@@ -155,4 +184,14 @@ function checkHash(){
             break;
     }
     location.hash = '';
+}
+
+function addExtra($obj){//$obj is a div.form-group
+    $obj.clone()
+        .insertAfter($obj)
+        .find('label').html('')
+        .siblings().last().find('.addExtra')
+        .removeClass('addExtra').addClass('delExtra')
+        .html('删除');
+    $obj.find('input').val('');
 }
