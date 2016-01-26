@@ -215,11 +215,16 @@ public class ActionReportService {
         searchRequestBuilder.setQuery(query);
         searchRequestBuilder.addAggregation(new CardinalityBuilder("ip").field(IP_FIELD_NAME));
         searchRequestBuilder.addAggregation(new CardinalityBuilder("uv").field(UID_FIELD_NAME)).request();
-        NestedBuilder extraBuilder=AggregationBuilders.nested(EXTRA_TERMS_AGG_NAME).path(EXTRA_FIELD_NAME);
-        for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
-            extraBuilder.subAggregation(new TermsBuilder(entry.getKey()).size(0).field(EXTRA_FIELD_NAME+"."+entry.getKey()).minDocCount(1));
+
+        if(params.getExtra()!=null){
+            NestedBuilder extraBuilder=AggregationBuilders.nested(EXTRA_TERMS_AGG_NAME).path(EXTRA_FIELD_NAME);
+            for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
+                extraBuilder.subAggregation(new TermsBuilder(entry.getKey()).size(0).field(EXTRA_FIELD_NAME+"."+entry.getKey()).minDocCount(1));
+            }
+            searchRequestBuilder.addAggregation(extraBuilder);
         }
-        searchRequestBuilder.addAggregation(extraBuilder);
+
+
         for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
             searchRequestBuilder.addAggregation(new TermsBuilder(entry.getValue()).size(0).field(entry.getKey()).minDocCount(1));
         }
