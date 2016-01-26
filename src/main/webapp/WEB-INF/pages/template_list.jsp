@@ -99,13 +99,6 @@
                 </table>
             </div>
 
-
-
-            <div class="tab-pane fade" id="room3">
-                3
-            </div>
-            <div class="tab-pane fade" id="room4">4</div>
-
         </div>
       </div>
     </div>
@@ -270,7 +263,7 @@
          <input class="form-control" id="interval" name="interval" type="text" placeholder="间隔时间" value="{{ interval || 0 }}"/>
        </div>
          <label  class="col-sm-3 control-label" for="unit">时间单位</label>
-         <div class="col-sm-2">
+         <div class="col-sm-3">
              <select  id="unit" name="unit" class="form-control">
                  <option value="0" {{if unit=="0" }} selected='selected' {{/if}}>请选择</option>
                  <option value="1" {{if unit=="1" }} selected='selected' {{/if}}>分钟</option>
@@ -280,6 +273,32 @@
              </select>
          </div>
      </div>
+     <div class="form-group">
+         <label  class="col-sm-2 control-label">附加字段</label>
+         <div class="col-sm-3">
+             <input class="form-control" name="extraName" type="text" placeholder="名称" value=""/>
+         </div>
+         <div class="col-sm-3">
+             <input class="form-control" name="extraKey" type="text" placeholder="关键字" value=""/>
+         </div>
+         <div class="col-sm-1">
+             <button class="btn btn-link addExtra"> 添加 </button>
+         </div>
+     </div>
+     {{ list extra as item }}
+     <div class="form-group">
+         <label  class="col-sm-2 control-label">附加字段</label>
+         <div class="col-sm-3">
+             <input class="form-control" name="extraName{{index}}" type="text" placeholder="名称" value=""/>
+         </div>
+         <div class="col-sm-3">
+             <input class="form-control" name="extraKey{{index}}" type="text" placeholder="关键字" value=""/>
+         </div>
+         <div class="col-sm-1">
+             <button class="btn btn-link delExtra"> 删除 </button>
+         </div>
+     </div>
+     {{/list}}
      <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">
          <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />
