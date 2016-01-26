@@ -55,7 +55,16 @@ public class DictDao {
     public List<Dict> find(String ids,int type, String description){
         StringBuilder sql=new StringBuilder("SELECT * FROM t_dict where 1=1");
         if(!StringUtils.isEmpty(ids)){
-            sql.append(" and id in(").append(ids).append(")");
+            sql.append(" and id in(");
+            String[] idsArray=ids.split(",");
+            for(int i=0;i<idsArray.length;i++){
+                String id=idsArray[i];
+                sql.append("'").append(id).append("'");
+                if(i<idsArray.length-1){
+                    sql.append(",");
+                }
+            }
+            sql.append(")");
         }
         if(type!=0){
             sql.append(" and type =").append(type);
