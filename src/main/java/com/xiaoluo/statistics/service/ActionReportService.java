@@ -121,9 +121,9 @@ public class ActionReportService {
             SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
             if(!aggName.equals(UID_TERMS_AGG_NAME)&&!aggName.equals(EXTRA_TERMS_AGG_NAME)){
                 Dict dict=dictService.get(bucket.getKeyAsString());
-                termsResult.setKey(dict.getDescription());
+                termsResult.setValue(dict.getDescription());
             }else{
-                termsResult.setKey(bucket.getKeyAsString());
+                termsResult.setValue(bucket.getKeyAsString());
             }
             termsResult.setCount(bucket.getDocCount());
             termsResults.add(termsResult);
@@ -149,7 +149,7 @@ public class ActionReportService {
         for(SearchParams searchParams:searchParamsList){
             if(termsResults!=null){
                 for(SearchStatResult.TermsResult termsResult:termsResults){
-                    uids.add(termsResult.getKey());
+                    uids.add(termsResult.getValue());
                 }
                 searchParams.setUids(uids);
             }
