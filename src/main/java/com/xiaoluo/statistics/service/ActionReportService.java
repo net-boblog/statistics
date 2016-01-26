@@ -36,6 +36,7 @@ import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregator;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
@@ -121,10 +122,16 @@ public class ActionReportService {
             SearchStatResult.TermsResult termsResult=new SearchStatResult.TermsResult();
             if(!aggName.equals(UID_TERMS_AGG_NAME)&&!aggName.equals(EXTRA_TERMS_AGG_NAME)){
                 Dict dict=dictService.get(bucket.getKeyAsString());
-                termsResult.setValue(dict.getDescription());
+                if(dict==null){
+                    termsResult.setValue(bucket.getKeyAsString());
+                }else{
+                    termsResult.setValue(dict.getDescription());
+                }
+
             }else{
                 termsResult.setValue(bucket.getKeyAsString());
             }
+            termsResult.setName(aggName);
             termsResult.setCount(bucket.getDocCount());
             termsResults.add(termsResult);
         }
@@ -137,15 +144,23 @@ public class ActionReportService {
                 List<SearchStatResult.TermsResult> termsResultList=buildTermsResultList((StringTerms) aggregation);
                 map.put(aggregation.getName(),termsResultList);
             }
-
+            if(aggregation instanceof InternalNested&&aggregation.getName().equals(EXTRA_TERMS_AGG_NAME)){
+                List<SearchStatResult.TermsResult> extraTermsResults=new ArrayList<SearchStatResult.TermsResult>();
+                InternalNested nested=(InternalNested)aggregation;
+                for(Aggregation agg:nested.getAggregations().asList()){
+                    if(agg instanceof StringTerms){
+                        extraTermsResults.addAll(buildTermsResultList((StringTerms)agg));
+                    }
+                }
+                map.put(aggregation.getName(),extraTermsResults);
+            }
 
         }
         return map;
     }
-    public List<Integer> funnelSearch(List<SearchParams> searchParamsList){
+    public List<SearchStatResult.TermsResult> funnelSearch(List<SearchParams> searchParamsList){
         List<String> uids=new ArrayList<String>();
         List<SearchStatResult.TermsResult> termsResults=null;
-        List<Integer> funnelResult=new ArrayList<Integer>(searchParamsList.size());
         for(SearchParams searchParams:searchParamsList){
             if(termsResults!=null){
                 for(SearchStatResult.TermsResult termsResult:termsResults){
@@ -154,10 +169,9 @@ public class ActionReportService {
                 searchParams.setUids(uids);
             }
             SearchResponse response=createSearchRequestBuilder(searchParams).get();
-            termsResults= getTermsAggResult(response).get(UID_FIELD_NAME);
-            funnelResult.add(termsResults.size());
+            termsResults= getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
         }
-        return funnelResult;
+        return termsResults;
 
     }
     public SearchRequestBuilder createSearchRequestBuilder(SearchParams params){
@@ -207,7 +221,7 @@ public class ActionReportService {
         if(params.getExtra()!=null){
             for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
                 TermsQueryBuilder extraTermsQueryBuilder=QueryBuilders.
-                        termsQuery(entry.getKey(),entry.getValue().split(","));
+                        termsQuery(EXTRA_FIELD_NAME+"."+entry.getKey(),entry.getValue().split(","));
                query.filter(QueryBuilders.nestedQuery(EXTRA_FIELD_NAME,extraTermsQueryBuilder));
             }
 
@@ -432,7 +446,6 @@ public class ActionReportService {
         sources.add(EVENT_FIELD_NAME);
         sources.add("type=string,index=not_analyzed");
         sources.add(EXTRA_FIELD_NAME);
-        //sources.add("type=string,index=not_analyzed");
         sources.add("type=nested");
         sources.add(TIME_FIELD_NAME);
         sources.add("type=date,format=epoch_millis");
