@@ -50,6 +50,7 @@ public class SearchStatResult {
         this.to = to;
     }
     public static class TermsResult{
+        private String name;
         protected String value;
         protected long count;
 
@@ -68,9 +69,7 @@ public class SearchStatResult {
         public void setCount(long count) {
             this.count = count;
         }
-    }
-    public static class ExtraTermsResult extends TermsResult{
-        private String name;
+
 
         public String getName() {
             return name;
