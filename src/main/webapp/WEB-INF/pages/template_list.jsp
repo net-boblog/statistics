@@ -111,7 +111,7 @@
             <h4 class="modal-title">编辑模板</h4>
           </div>
           <div class="modal-body">
-            <form id="updateForm" class="form-horizontal">
+            <form id="updateForm" class="form-horizontal rel">
 
             </form>
           </div>
@@ -125,7 +125,7 @@
 
 <script type="text/html" id="dictListTemp">
     <tr>
-        <td>?</td>
+        <td><input type="text" placeholder="ID" class="form-control text-center w100"/></td>
         <td>
             <div class="center-block" style="width: 150px;">
                 <select name="dictType" class="form-control dictType">
@@ -273,32 +273,32 @@
              </select>
          </div>
      </div>
-     <div class="form-group">
+     <div class="form-group extra">
          <label  class="col-sm-2 control-label">附加字段</label>
          <div class="col-sm-3">
-             <input class="form-control" name="extraName" type="text" placeholder="名称" value=""/>
+             <input class="form-control extraName" type="text" placeholder="描述" value=""/>
          </div>
          <div class="col-sm-3">
-             <input class="form-control" name="extraKey" type="text" placeholder="关键字" value=""/>
+             <input class="form-control extraKey" type="text" placeholder="关键字" value=""/>
          </div>
          <div class="col-sm-1">
-             <button class="btn btn-link addExtra"> 添加 </button>
+             <button type="button" class="btn btn-link addExtra"> 添加 </button>
          </div>
      </div>
-     {{ list extra as item }}
-     <div class="form-group">
-         <label  class="col-sm-2 control-label">附加字段</label>
+     {{ each extra as item }}
+     <div class="form-group extra">
+         <label  class="col-sm-2 control-label"></label>
          <div class="col-sm-3">
-             <input class="form-control" name="extraName{{index}}" type="text" placeholder="名称" value=""/>
+             <input class="form-control extraName" type="text" placeholder="描述" value="{{item.name}}"/>
          </div>
          <div class="col-sm-3">
-             <input class="form-control" name="extraKey{{index}}" type="text" placeholder="关键字" value=""/>
+             <input class="form-control extraKey" type="text" placeholder="关键字" value="{{item.value}}"/>
          </div>
          <div class="col-sm-1">
-             <button class="btn btn-link delExtra"> 删除 </button>
+             <button type="button" class="btn btn-link delExtra"> 删除 </button>
          </div>
      </div>
-     {{/list}}
+     {{/each}}
      <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">
          <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />

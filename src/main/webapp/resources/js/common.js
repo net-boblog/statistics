@@ -25,12 +25,21 @@ $.bom = {
 };
 
 
-$.alert = function(msg,color){
-    var box = $('#alertBox');
-    if ( box.length == 0 ) {
-        box = $('<div id="alertBox"></div>');
-        $(document.body).append(box);
+$.alert = function(msg,color,id){
+    if (id){
+       var box = $(id).find('.alertBox');
+        if (box.length == 0){
+            box = $('<div class="alert-box"></div>');
+            $(id).append(box);
+        }
+    }else{
+        var box = $('#alertBox');
+        if ( box.length == 0 ) {
+            box = $('<div id="alertBox"></div>');
+            $(document.body).append(box);
+        }
     }
+
     var color = color || 'pinkRed';
     var msg = $('<div class="bg-'+color+' alert-msg">'+msg+'</div>');
     box.append(msg);
