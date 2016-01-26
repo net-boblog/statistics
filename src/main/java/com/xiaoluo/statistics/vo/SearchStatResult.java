@@ -50,15 +50,15 @@ public class SearchStatResult {
         this.to = to;
     }
     public static class TermsResult{
-        private String key;
-        private long count;
+        protected String value;
+        protected long count;
 
-        public String getKey() {
-            return key;
+        public String getValue() {
+            return value;
         }
 
-        public void setKey(String key) {
-            this.key = key;
+        public void setValue(String value) {
+            this.value = value;
         }
 
         public long getCount() {
@@ -67,6 +67,17 @@ public class SearchStatResult {
 
         public void setCount(long count) {
             this.count = count;
+        }
+    }
+    public static class ExtraTermsResult extends TermsResult{
+        private String name;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 
