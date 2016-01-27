@@ -152,12 +152,12 @@ function saveTemplate(obj){//obj was a form
         }
     }
 
-    data['extra']=[];
+    data['extra']={};
     $(obj).find('.extra').each(function(index,el){
        var name = $(el).find('.extraName').val();
        var value = $(el).find('.extraKey').val();
         if (name){
-            data.extra.push({name:name,value:value});
+            data.extra[name] = value;
         }
     });
 

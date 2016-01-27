@@ -125,7 +125,9 @@
 
 <script type="text/html" id="dictListTemp">
     <tr>
-        <td><input type="text" placeholder="ID" class="form-control text-center w100"/></td>
+        <td>
+            <input type="text" placeholder="ID" class="form-control center-block text-center w100"/>
+        </td>
         <td>
             <div class="center-block" style="width: 150px;">
                 <select name="dictType" class="form-control dictType">
