@@ -164,7 +164,7 @@ public class ActionReportService {
         }
         return map;
     }
-    public Map<String,Integer> funnelSearch(List<Integer> templateIds){
+    public Map<String,Integer> funnelSearch(List<Integer> templateIds,Date from,Date to){
         List<String> uids=new ArrayList<String>();
         List<SearchStatResult.TermsResult> termsResults=null;
         Map<String,Integer> result=new HashMap<String, Integer>();
@@ -173,8 +173,8 @@ public class ActionReportService {
             SearchTemplate template=searchTemplateService.get(Integer.valueOf(templateId));
             String params=template.getParams();
             SearchParams searchParams= JSON.parseObject(params,SearchParams.class);
-            searchParams.setFrom(null);
-            searchParams.setTo(null);
+            searchParams.setFrom(from);
+            searchParams.setTo(to);
             searchParamsList.put(template.getName(),searchParams);
 
         }

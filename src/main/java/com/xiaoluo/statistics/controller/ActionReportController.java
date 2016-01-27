@@ -30,10 +30,6 @@ import java.util.*;
 public class ActionReportController extends RestBaseController{
     @Autowired
     private ActionReportService actionReportService;
-    @Autowired
-    private SearchTemplateService searchTemplateService;
-    @Autowired
-    private DictService dictService;
     @RequestMapping("/multiSearch")
     public @ResponseBody String multiSearch(String data) throws Exception{
         SearchParams params=JSON.parseObject(data,SearchParams.class);
@@ -42,7 +38,9 @@ public class ActionReportController extends RestBaseController{
     }
     @RequestMapping("/searchByTemplate")
     @ResponseBody
-    public String searchByTemplate(Model model,int templateId, @RequestParam(required = false) Date from, @RequestParam (required = false)Date to) throws Exception{
+    public String searchByTemplate(Model model,int templateId,
+                                   @RequestParam(required = false) Date from,
+                                   @RequestParam (required = false)Date to) throws Exception{
         TotalStatResult totalStatResult=actionReportService.searchByTemplate(templateId,from,to);
         ApiResult apiResult=new ApiResult(totalStatResult);
 
@@ -54,12 +52,14 @@ public class ActionReportController extends RestBaseController{
 
     }
     @RequestMapping("/funnelSearch")
-    public @ResponseBody String funnelSearch(String templateIds){
+    public @ResponseBody String funnelSearch(String templateIds ,
+                                             @RequestParam(required=false) Date from,
+                                             @RequestParam (required = false)Date to){
         List<Integer> ids=new ArrayList<Integer>();
         for(String templateId:templateIds.split(",")){
             ids.add(Integer.parseInt(templateId));
         }
-        ApiResult result=new ApiResult(actionReportService.funnelSearch(ids));
+        ApiResult result=new ApiResult(actionReportService.funnelSearch(ids,from,to));
         return result.toString();
 
     }
