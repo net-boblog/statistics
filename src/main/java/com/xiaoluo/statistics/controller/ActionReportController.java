@@ -41,40 +41,12 @@ public class ActionReportController extends RestBaseController{
         return JSON.toJSONString(actionReportService.fullSearch(params));
     }
     @RequestMapping("/searchByTemplate")
+    @ResponseBody
     public String searchByTemplate(Model model,int templateId, @RequestParam(required = false) Date from, @RequestParam (required = false)Date to) throws Exception{
         TotalStatResult totalStatResult=actionReportService.searchByTemplate(templateId,from,to);
-        List<Long> pvs=new ArrayList<Long>();
-        List<Double> uvs=new ArrayList<Double>();
-        List<Double> ips=new ArrayList<Double>();
-        List<String> times=new ArrayList<String>();
-        for(SearchStatResult result:totalStatResult.getSectionStatResults()){
-            pvs.add(result.getPv());
-            uvs.add(result.getUv());
-            ips.add(result.getIp());
-            times.add("\""+result.getTo()+"\"");
-        }
-        model.addAttribute("totalPv",totalStatResult.getTotalStatResult().getPv());
-        model.addAttribute("totalUv",totalStatResult.getTotalStatResult().getUv());
-        model.addAttribute("totalIp",totalStatResult.getTotalStatResult().getIp());
-        model.addAttribute("termsAggMap",totalStatResult.getTermsResultsMap());
-        model.addAttribute("channel_terms_agg",JSON.toJSONString(totalStatResult.getTermsResultsMap().get("channel")));
-        model.addAttribute("pvs",Arrays.toString(pvs.toArray()));
-        model.addAttribute("uvs",Arrays.toString(uvs.toArray()));
-        model.addAttribute("ips",Arrays.toString(ips.toArray()));
-        model.addAttribute("times", Arrays.toString(times.toArray()));
+        ApiResult apiResult=new ApiResult(totalStatResult);
 
-        List<Dict> pages=dictService.find(null,DictType.PAGE.value,null);
-        List<Dict> events=dictService.find(null,DictType.EVENT.value,null);
-        List<Dict> channels=dictService.find(null,DictType.CHANNEL.value,null);
-        List<Dict> terminals=dictService.find(null,DictType.TERMINAL.value,null);
-        model.addAttribute("pages",pages);
-        model.addAttribute("events",events);
-        model.addAttribute("channels",channels);
-        model.addAttribute("terminals",terminals);
-
-        model.addAttribute("templateId",templateId);
-
-        return "search_result";
+        return apiResult.toString();
     }
     @RequestMapping("/rebuild")
     public @ResponseBody String rebuild(HttpServletRequest request) throws Exception{
@@ -83,17 +55,12 @@ public class ActionReportController extends RestBaseController{
     }
     @RequestMapping("/funnelSearch")
     public @ResponseBody String funnelSearch(String templateIds){
-        List<SearchParams> searchParamsList=new ArrayList<SearchParams>();
+        List<Integer> ids=new ArrayList<Integer>();
         for(String templateId:templateIds.split(",")){
-            SearchTemplate template=searchTemplateService.get(Integer.valueOf(templateId));
-            String params=template.getParams();
-            SearchParams searchParams= JSON.parseObject(params,SearchParams.class);
-            searchParams.setFrom(null);
-            searchParams.setTo(null);
-            searchParamsList.add(searchParams);
-
+            ids.add(Integer.parseInt(templateId));
         }
-        return actionReportService.funnelSearch(searchParamsList).toString();
+        ApiResult result=new ApiResult(actionReportService.funnelSearch(ids));
+        return result.toString();
 
     }
     @RequestMapping(value = "/insert",method = RequestMethod.POST)

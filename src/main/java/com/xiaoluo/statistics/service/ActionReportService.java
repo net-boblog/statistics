@@ -13,6 +13,8 @@ import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.util.DateKit;
 import com.xiaoluo.statistics.vo.*;
 import org.elasticsearch.Version;
+import org.elasticsearch.action.admin.cluster.reroute.ClusterRerouteRequest;
+import org.elasticsearch.action.admin.cluster.reroute.ClusterRerouteRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -26,6 +28,10 @@ import org.elasticsearch.action.search.*;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
+import org.elasticsearch.cluster.routing.allocation.RerouteExplanation;
+import org.elasticsearch.cluster.routing.allocation.RoutingAllocation;
+import org.elasticsearch.cluster.routing.allocation.command.AllocationCommand;
+import org.elasticsearch.cluster.routing.allocation.command.AllocationCommands;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -158,10 +164,22 @@ public class ActionReportService {
         }
         return map;
     }
-    public List<SearchStatResult.TermsResult> funnelSearch(List<SearchParams> searchParamsList){
+    public Map<String,Integer> funnelSearch(List<Integer> templateIds){
         List<String> uids=new ArrayList<String>();
         List<SearchStatResult.TermsResult> termsResults=null;
-        for(SearchParams searchParams:searchParamsList){
+        Map<String,Integer> result=new HashMap<String, Integer>();
+        Map<String,SearchParams> searchParamsList=new HashMap<String, SearchParams>();
+        for(Integer templateId:templateIds){
+            SearchTemplate template=searchTemplateService.get(Integer.valueOf(templateId));
+            String params=template.getParams();
+            SearchParams searchParams= JSON.parseObject(params,SearchParams.class);
+            searchParams.setFrom(null);
+            searchParams.setTo(null);
+            searchParamsList.put(template.getName(),searchParams);
+
+        }
+        for(Map.Entry<String,SearchParams> entry:searchParamsList.entrySet()){
+            SearchParams searchParams=entry.getValue();
             if(termsResults!=null){
                 for(SearchStatResult.TermsResult termsResult:termsResults){
                     uids.add(termsResult.getValue());
@@ -170,8 +188,9 @@ public class ActionReportService {
             }
             SearchResponse response=createSearchRequestBuilder(searchParams).get();
             termsResults= getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
+            result.put(entry.getKey(),termsResults.size());
         }
-        return termsResults;
+        return result;
 
     }
     public SearchRequestBuilder createSearchRequestBuilder(SearchParams params){
