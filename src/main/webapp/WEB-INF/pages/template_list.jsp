@@ -15,7 +15,7 @@
         var DEFAULT_TEMP_ID = '';
     </script>
     <style>
-        .pie{height: 300px;}
+        .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
     </style>
 </head>
 <body>
@@ -23,37 +23,53 @@
       <div class="page-header">
         <h1>日志统计系统</h1>
       </div>
+        <%--统计结果 图表部分 start--%>
+      <div class="box">
+          <div class="box-header">
+              <h4>
+                  统计模板: <span id="statTempName" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  Total IP: <span id="totalIp" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  Total PV: <span id="totalPv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  Total UV: <span id="totalUv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  起止时间:
+                  <input type="text" id="statStartTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
+                  <span class="text-primary">—</span>
+                  <input type="text" id="statEndTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
+                  <a href="javascript:;" id="searchBytime">查询</a>
+              </h4>
+          </div>
+          <div class="box-body">
+              <div id="columnContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+              <div id="pieContainer" class="row pb20"></div>
+              <div id="itemsContainer" class="row bte pt20"></div>
+          </div>
+      </div>
+        <%--统计结果 图表部分 end--%>
 
-        <div class="box">
-            <div class="box-header">
-                <h4>
-                    Total IP: <span id="totalIp" class="text-primary pr20"></span>
-                    Total PV: <span id="totalPv" class="text-primary pr20"></span>
-                    Total UV: <span id="totalUv" class="text-primary pr20"></span>
+        <%--当前统计结果对应的模板 start--%>
+      <div class="box">
+          <div class="box-body">
+              <form id="searchForm" class="form-horizontal rel">
+              </form>
+          </div>
+          <div class="box-footer">
+              <span></span>
+              <a href="javascript:;" class="slideToggleBtn pull-right">收起</a>
+          </div>
+      </div>
+        <%--当前统计结果对应的模板 end--%>
 
-                    起止时间: <span id="statsTime" class="text-primary pr20"></span>
-                </h4>
-            </div>
-            <div class="box-body">
-                <div id="columnContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
-                <div id="pieContainer" class="row"></div>
-            </div>
-        </div>
-        <div class="box">
-            <div class="box-body">
-                <form id="searchForm" class="form-horizontal rel">
-
-                </form>
-            </div>
-        </div>
+        <%--统计系统功能标签页 start--%>
       <div class="box">
         <div class="box-header">
           <ul class="tag-group">
-            <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
+              <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
               <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
+              <li class="tag tag-default" data-toggle="tab" data-target="#room3">漏斗图</li>
           </ul>
         </div>
         <div class="box-body tab-content">
+
             <div class="tab-pane fade active in" id="room1">
               <div class="clearfix pb20">
                   <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
@@ -73,16 +89,13 @@
                     <td>${template.name}</td>
                     <td>
                       <a href="javascript:;" data-id="${template.id}" class="editTemplate">编辑</a>
-                      <a href="javascript:;" data-id="${template.id}" class="showCharts">查看统计</a>
+                      <a href="javascript:;" data-id="${template.id}" data-name="${template.name}" class="showCharts">查看统计</a>
                     </td>
                   </tr>
                 </c:forEach>
                 </tbody>
               </table>
             </div>
-
-
-
 
             <div class="tab-pane fade" id="room2">
                 <form class="form-horizontal" id="searchDict">
@@ -110,7 +123,6 @@
                         </div>
                     </div>
                 </form>
-
                 <table class="table table-bordered">
                     <thead>
                     <tr>
@@ -121,13 +133,16 @@
                     </tr>
                     </thead>
                     <tbody id="dictList">
-
                     </tbody>
                 </table>
             </div>
 
+            <div class="tab-pane fade" id="room3" style="min-height: 600px">
+
+            </div>
         </div>
       </div>
+        <%--统计系统功能标签页 end--%>
     </div>
 
     <div class="modal fade" id="templateModal">
@@ -149,6 +164,27 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <script type="text/html" id="statItemListTemp">
+        <div class="col-sm-4">
+            <table class="table table-bordered">
+                <caption>{{ title }}</caption>
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>count</th>
+                    </tr>
+                </thead>
+                <tbody>
+                {{each list as item}}
+                    <tr>
+                        <td>{{item.value}}</td>
+                        <td>{{item.count}}</td>
+                    </tr>
+                {{/each}}
+                </tbody>
+            </table>
+        </div>
+    </script>
 
 <script type="text/html" id="dictListTemp">
     <tr>
@@ -331,7 +367,7 @@
      {{ if stats}}
      <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">
-         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" data-id='{{ id }}' value="保存并查看统计结果" />
+         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" data-id='{{ id }}' data-name="{{ name }}" value="保存并查看统计结果" />
        </div>
      </div>
      {{else}}
@@ -346,6 +382,9 @@
     <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
     <script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
     <script src="${ctx}/resources/js/art-template.js"></script>
+    <script src="${ctx}/resources/js/input-mask3/jquery.inputmask.min.js"></script>
+    <script src="${ctx}/resources/js/input-mask3/inputmask.min.js"></script>
+    <script src="${ctx}/resources/js/input-mask3/inputmask.date.extensions.min.js"></script>
     <script src="${ctx}/resources/js/common.js"></script>
     <script src="${ctx}/resources/js/list.js"></script>
 </body>

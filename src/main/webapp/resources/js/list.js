@@ -56,9 +56,28 @@ $(function(){
         $(e.currentTarget).parents('.form-group').remove();
     });
     $(document.body).on('click','.showCharts',function(e){
-        var id = e.currentTarget.dataset.id;
-        XLstats.showTemplateStat(id);
+        var tar = e.currentTarget;
+        XLstats.showTemplateStat(tar.dataset.id,tar.dataset.name);
     });
+    $(document.body).on('click','.slideToggleBtn',function(e){
+        var $tar = $(e.currentTarget);
+        if ($tar.hasClass('active')){
+            $tar.removeClass('active').html('收起');
+            $tar.parent().siblings().show();
+            $tar.siblings('span').html('');
+        }else{
+            $tar.addClass('active').html('展开');
+            $tar.parent().siblings().hide();
+            var str = '筛选条件概览：' + $tar.parents('.box').find('form').serialize().replace(/&/g,' || ');
+            $tar.siblings('span').html(str);
+        }
+    });
+    $("[data-inputmask]").inputmask();
+    $('#searchBytime').click(function(e){
+        var from = $('#statStartTime').val();
+        var to = $('#statEndTime').val();
+        XLstats.showTemplateStat(e.target.dataset.id,false,from,to);
+    })
 })
 
 var XLstats = {
@@ -66,39 +85,69 @@ var XLstats = {
 
         this.getDictList();//更新字典列表
         this.checkHash();
-        var tempId = $('#resultTable').find('a[data-id]').first().data('id');
-        this.showTemplateStat(tempId);//默认显示第一个模板的统计结果
+        var tar = $('#resultTable').find('a[data-id]').eq(1);
+        var tempId = tar.data('id');
+        var tempName = tar.data('name');
+        this.showTemplateStat(tempId,tempName);//默认显示第一个模板的统计结果
 
     },
-    showTemplateStat : function(tempId) {
+    showTemplateStat : function(tempId,tempName,from,to) {
+        var _self = this;
+        if (from || to){
+            var postdata = {templateId : tempId, from : from , to : to}
+        }else{
+            var postdata = { templateId : tempId}
+        }
         $.sajax({
             url : '/report/searchByTemplate',
-            data:{ templateId : tempId},
+            data:postdata,
             success : function(data) {
-                console.debug(data);
-                XLstats.editTemplate(tempId,true);
-                XLstats.showTotal(data.data.totalStatResult);
-                XLstats.showColumnChart(data.data.sectionStatResults);
-                XLstats.showTermsResult(data.data.termsResultsMap);
+                // console.debug(data);
+                _self.editTemplate(tempId,true);
+                _self.showColumnChart(data.data.sectionStatResults);
+                _self.showTermsResult(data.data.termsResultsMap);
+
+                if (tempName){
+                    $('#statTempName').html(tempName);
+                }
+                document.querySelector('#searchBytime').dataset.id = tempId ;
+                $('#totalIp').html(data.data.totalStatResult.ip);
+                $('#totalPv').html(data.data.totalStatResult.pv);
+                $('#totalUv').html(data.data.totalStatResult.uv);
+                $('#statStartTime').val(data.data.totalStatResult.from);
+                $('#statEndTime').val(data.data.totalStatResult.to);
             }
         })
     },
+    showItemList: function(data,title){
+        if (!data || data.length==0 ){
+            return;
+        }
+        $('#itemsContainer').append(template('statItemListTemp',{list:data,title:title || '字段统计'}));
+    },
     showTermsResult:function(data){
-        var _self = this;
-        //来源页 to 停留页 漏斗图
-        var pagesContainer = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
-        _self.showPieChart(pagesContainer,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg));
-        var pagesContainer2 = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
-        _self.showPieChart(pagesContainer2,'停留页','pages',_self.toPercent(data.current_page_terms_agg));
 
-        //终端
-        var terminalContainer = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
-        _self.showPieChart(terminalContainer,'终端','terminal',_self.toPercent(data.terminal_terms_agg));
-        //渠道
-        var channelContainer = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
-        _self.showPieChart(channelContainer,'渠道','pages',_self.toPercent(data.channel_terms_agg));
-        //事件 列表
-        //附加字段
+        var _self = this;
+        var $container = $('#pieContainer');
+            $container.html('');
+
+        //来源页
+        var prefix = $('<div class="col-sm-6 pie"></div>').appendTo($container);
+        _self.showPieChart(prefix,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg));
+        //停留页
+         var current = $('<div class="col-sm-6 pie"></div>').appendTo($container);
+         _self.showPieChart(current,'停留页','pages',_self.toPercent(data.current_page_terms_agg));
+
+         //终端
+         var terminal = $('<div class="col-sm-6 pie"></div>').appendTo($container);
+         _self.showPieChart(terminal,'终端','terminal',_self.toPercent(data.terminal_terms_agg));
+         //渠道
+         var channel = $('<div class="col-sm-6 pie"></div>').appendTo($container);
+         _self.showPieChart(channel,'渠道','pages',_self.toPercent(data.channel_terms_agg));
+        //事件 用户ID列表 附加字段
+        _self.showItemList(data.uid_terms_agg,'用户统计');
+        _self.showItemList(data.event_terms_agg,'事件统计');
+        _self.showItemList(data.extra_terms_agg,'附加字段');
 
     },
     toPercent: function (data){
@@ -115,12 +164,6 @@ var XLstats = {
             arr[i].y = arr[i].y/sum;
         };
         return arr;
-    },
-    showTotal: function (data){
-        $('#totalIp').html(data.ip);
-        $('#totalPv').html(data.pv);
-        $('#totalUv').html(data.uv);
-        $('#statsTime').html(data.from +' - ' + data.to);
     },
     editDict: function ($tr){
         var selecttemp = template('selectTemp',{dictType:$tr.data('type')});
@@ -141,7 +184,7 @@ var XLstats = {
                 $.alert('请选择字段类型并填写字段描述');
             }else{
                 $.post(ROOT + '/dict/update',data,function(data){
-                    console.debug(data);
+                    //console.debug(data);
                     if (data.code == 0) {
                         getDictList();
                     }
@@ -161,12 +204,12 @@ var XLstats = {
 
     editTemplate: function (id,isStat){
             $.get(ROOT + '/template/get?id='+id,function(data){
-                console.debug(data);
+                //console.debug(data);
                 if (data.code == 0) {
                     var DATA = data.data;
                     var params = JSON.parse(DATA.params);
 
-                    console.debug(params);
+                    // console.debug(params);
                     DATA.interval = params.interval || '';
                     DATA.termsCountField = params.termsCountField || '';
                     DATA.unit = params.unit || '';
@@ -318,7 +361,8 @@ var XLstats = {
     showColumnChart: function (data){
             var TIME = [] , IP = [] , PV = [], UV = [];
             for (var i = data.length - 1; i >= 0; i--) {
-                TIME[i] = data[i].from + data[i].to;
+
+                TIME[i] = data[i].from.substr(5,5) + '至'+ data[i].to.substr(5,5);
                 IP[i] = data[i].ip;
                 PV[i] = data[i].pv;
                 UV[i] = data[i].uv;
@@ -329,7 +373,7 @@ var XLstats = {
                     type: 'column'
                 },
                 title: {
-                    text: '柱状图'
+                    text: '概览'
                 },
                 subtitle: {
                     text: 'Source: WorldClimate.com'
