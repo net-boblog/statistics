@@ -206,7 +206,7 @@
      <div class="form-group" style="display: none">
        <label  class="col-sm-2 control-label" for="id">ID</label>
        <div class="col-sm-4">
-         <input class="form-control" id="id" name="id" type="text" value="{{ id || 0 }}" />
+         <input class="form-control" id="id" name="id" type="text" value="{{ id }}" />
        </div>
      </div>
      <div class="form-group" style="display: none">
@@ -331,7 +331,7 @@
      {{ if stats}}
      <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">
-         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" value="保存并查看统计结果" />
+         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" data-id='{{ id }}' value="保存并查看统计结果" />
        </div>
      </div>
      {{else}}

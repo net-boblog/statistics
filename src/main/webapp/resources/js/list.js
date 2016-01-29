@@ -28,6 +28,7 @@ $(function(){
             return ;
         }
         XLstats.saveTemplate(tar[0],true);
+        XLstats.showTemplateStat(e.currentTarget.dataset.id);
     });
     $(document.body).on('click','.addDict',function(e){
         var tar= $(e.currentTarget).parents('tr');
@@ -85,14 +86,16 @@ var XLstats = {
     showTermsResult:function(data){
         var _self = this;
         //来源页 to 停留页 漏斗图
-        //var pagesContainer = $('<div class="col-sm-4 pie"></div>').appendTo('#pieContainer');
-        //_self.showPieChart(pagesContainer,'页面来源','pages',_self.toPercent(data.prefix_page_terms_agg));
+        var pagesContainer = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
+        _self.showPieChart(pagesContainer,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg));
+        var pagesContainer2 = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
+        _self.showPieChart(pagesContainer2,'停留页','pages',_self.toPercent(data.current_page_terms_agg));
 
         //终端
-        var terminalContainer = $('<div class="col-sm-4 pie"></div>').appendTo('#pieContainer');
+        var terminalContainer = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
         _self.showPieChart(terminalContainer,'终端','terminal',_self.toPercent(data.terminal_terms_agg));
         //渠道
-        var channelContainer = $('<div class="col-sm-4 pie"></div>').appendTo('#pieContainer');
+        var channelContainer = $('<div class="col-sm-5 pie"></div>').appendTo('#pieContainer');
         _self.showPieChart(channelContainer,'渠道','pages',_self.toPercent(data.channel_terms_agg));
         //事件 列表
         //附加字段
