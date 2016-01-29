@@ -78,6 +78,9 @@ $(function(){
         var to = $('#statEndTime').val();
         XLstats.showTemplateStat(e.target.dataset.id,false,from,to);
     })
+    $('#funnelForm').submit(function(e){
+        e.preventDefault();
+    });
 })
 
 var XLstats = {
@@ -89,6 +92,7 @@ var XLstats = {
         var tempId = tar.data('id');
         var tempName = tar.data('name');
         this.showTemplateStat(tempId,tempName);//默认显示第一个模板的统计结果
+        this.showFunnelSearch('80,81');
 
     },
     showTemplateStat : function(tempId,tempName,from,to) {
@@ -119,6 +123,51 @@ var XLstats = {
             }
         })
     },
+    showFunnelSearch:function(ids,from,to){
+        var _self = this;
+        if (from || to){
+            var postdata = {templateId : ids, from : from , to : to}
+        }else{
+            var postdata = { templateId : ids}
+        }
+        $.sajax({
+            url : '/report/funnelSearch',
+            data:postdata,
+            success : function(data) {
+                 console.debug(data);
+                var funnelData = [];
+                for (key in data.data){
+                    funnelData.push([key,data.data[key]]);
+                }
+                $('#funnelContainer').highcharts({
+                    chart: {type: 'funnel',marginRight: 100},
+                    title: {
+                        text: '数据漏斗',
+                        x: -50
+                    },
+                    plotOptions: {
+                        series: {
+                            dataLabels: {
+                                enabled: true,
+                                format: '<b>{point.name}</b> ({point.y:,.0f})',
+                                color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black',
+                                softConnector: true
+                            },
+                            neckWidth: '30%',
+                            neckHeight: '25%',
+                        }
+                    },
+                    legend: {
+                        enabled: false
+                    },
+                    series: [{
+                        name: '模板',
+                        data: funnelData
+                    }]
+                });
+            }
+        })
+    },
     showItemList: function(data,title){
         if (!data || data.length==0 ){
             return;
@@ -145,6 +194,7 @@ var XLstats = {
          var channel = $('<div class="col-sm-6 pie"></div>').appendTo($container);
          _self.showPieChart(channel,'渠道','pages',_self.toPercent(data.channel_terms_agg));
         //事件 用户ID列表 附加字段
+        $('#itemsContainer').html('');
         _self.showItemList(data.uid_terms_agg,'用户统计');
         _self.showItemList(data.event_terms_agg,'事件统计');
         _self.showItemList(data.extra_terms_agg,'附加字段');
