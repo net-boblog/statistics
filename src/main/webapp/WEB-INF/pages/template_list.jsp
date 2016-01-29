@@ -12,13 +12,40 @@
   <script src="${ctx}/resources/js/bootstrap/bootstrap.min.js"></script>
     <script>
         var ROOT = '${ctx}';
+        var DEFAULT_TEMP_ID = '';
     </script>
+    <style>
+        .pie{height: 300px;}
+    </style>
 </head>
 <body>
     <div class="container">
       <div class="page-header">
         <h1>日志统计系统</h1>
       </div>
+
+        <div class="box">
+            <div class="box-header">
+                <h4>
+                    Total IP: <span id="totalIp" class="text-primary pr20"></span>
+                    Total PV: <span id="totalPv" class="text-primary pr20"></span>
+                    Total UV: <span id="totalUv" class="text-primary pr20"></span>
+
+                    起止时间: <span id="statsTime" class="text-primary pr20"></span>
+                </h4>
+            </div>
+            <div class="box-body">
+                <div id="columnContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+                <div id="pieContainer" class="row"></div>
+            </div>
+        </div>
+        <div class="box">
+            <div class="box-body">
+                <form id="searchForm" class="form-horizontal rel">
+
+                </form>
+            </div>
+        </div>
       <div class="box">
         <div class="box-header">
           <ul class="tag-group">
@@ -46,7 +73,7 @@
                     <td>${template.name}</td>
                     <td>
                       <a href="javascript:;" data-id="${template.id}" class="editTemplate">编辑</a>
-                      <a href="${ctx}/report/searchByTemplate?templateId=${template.id}">搜索</a>
+                      <a href="javascript:;" data-id="${template.id}" class="showCharts">查看统计</a>
                     </td>
                   </tr>
                 </c:forEach>
@@ -121,7 +148,7 @@
         </div><!-- /.modal-content -->
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
-    
+
 
 <script type="text/html" id="dictListTemp">
     <tr>
@@ -301,11 +328,19 @@
          </div>
      </div>
      {{/each}}
+     {{ if stats}}
+     <div class="form-group">
+       <div class="col-sm-offset-2 col-sm-4">
+         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" value="保存并查看统计结果" />
+       </div>
+     </div>
+     {{else}}
      <div class="form-group">
        <div class="col-sm-offset-2 col-sm-4">
          <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />
        </div>
      </div>
+    {{/if}}
 </script>
 
     <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>

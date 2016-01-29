@@ -48,7 +48,26 @@ $.alert = function(msg,color,id){
            $(this).remove();
        });
     },3000)
-}
+};
+
+$.sajax = function(option){
+    $.ajax({
+        type : option.type || 'GET',
+        url  : option.url,
+        data : option.data || {},
+        dataType : option.dataType || 'json',
+        success : function (data){
+            if (data.code == 0){
+                option.success(data);
+            }else{
+                $.alert(data.msg);
+            }
+        },
+        error : function(){
+            $.alert('网络错误 >...< 请检查网络');
+        }
+    })
+};
 template.helper("filterDictType",function(type){
 
     switch(type){
