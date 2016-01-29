@@ -320,6 +320,11 @@ public class ActionReportService {
         searchParams.setTo(to);
         return fullSearch(searchParams);
     }
+    public void groupUsers(SearchParams params){
+        SearchResponse response=createSearchRequestBuilder(params).get();
+        List<SearchStatResult.TermsResult> termsResults=getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
+
+    }
     public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
         if(params.getFrom()==null){
             params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
