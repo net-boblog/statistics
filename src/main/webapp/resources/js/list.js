@@ -226,7 +226,7 @@ var XLstats = {
             arr.push(item);
         };
         for (var i = arr.length - 1; i >= 0; i--) {
-            arr[i].y = arr[i].y/sum;
+            arr[i].y = arr[i].y;///sum;
         };
         return arr;
     },
@@ -400,7 +400,7 @@ var XLstats = {
                 text: title
             },
             tooltip: {
-                pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+                pointFormat: '占比: <b>{point.percentage:.1f}%</b><br>总数:<b>{point.y:.0f}</b>'
             },
             plotOptions: {
                 pie: {
@@ -408,7 +408,7 @@ var XLstats = {
                     cursor: 'pointer',
                     dataLabels: {
                         enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %<br>总数:<b>{point.y:.0f}</b>',
                         style: {
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                         }
