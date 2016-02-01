@@ -168,7 +168,7 @@ var XLstats = {
                 $container.highcharts({
                     chart: {type: 'funnel'},
                     title: {
-                        text: '数据漏斗',
+                        text: '转化率',
                         x: -50
                     },
                     plotOptions: {

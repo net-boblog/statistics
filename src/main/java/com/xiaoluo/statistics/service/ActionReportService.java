@@ -165,10 +165,10 @@ public class ActionReportService {
         return map;
     }
     public Map<String,Integer> funnelSearch(List<Integer> templateIds,Date from,Date to){
-        List<String> uids=new ArrayList<String>();
+        List<String> uids=null;
         List<SearchStatResult.TermsResult> termsResults=null;
-        Map<String,Integer> result=new HashMap<String, Integer>();
-        Map<String,SearchParams> searchParamsList=new HashMap<String, SearchParams>();
+        Map<String,Integer> result=new LinkedHashMap<String, Integer>();
+        Map<String,SearchParams> searchParamsList=new LinkedHashMap<String, SearchParams>();
         for(Integer templateId:templateIds){
             SearchTemplate template=searchTemplateService.get(Integer.valueOf(templateId));
             String params=template.getParams();
@@ -180,15 +180,21 @@ public class ActionReportService {
         }
         for(Map.Entry<String,SearchParams> entry:searchParamsList.entrySet()){
             SearchParams searchParams=entry.getValue();
+            uids=new ArrayList<String>();
             if(termsResults!=null){
                 for(SearchStatResult.TermsResult termsResult:termsResults){
                     uids.add(termsResult.getValue());
                 }
-                searchParams.setUids(uids);
+                if(uids.size()>0){
+                    searchParams.setUids(uids);
+                }else{
+                    searchParams.setUids(Arrays.asList("0"));
+                }
             }
             SearchResponse response=createSearchRequestBuilder(searchParams).get();
             termsResults= getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
             result.put(entry.getKey(),termsResults.size());
+
         }
         return result;
 
