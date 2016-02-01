@@ -80,6 +80,12 @@ $(function(){
     })
     $('#funnelForm').submit(function(e){
         e.preventDefault();
+        var input = e.currentTarget.elements;
+        console.debug(input);
+        var ids = input[0].value ;
+        var from = input[1].value ;
+        var to = input[2].value ;
+        XLstats.showFunnelSearch(ids,from,to);
     });
 })
 
@@ -102,6 +108,7 @@ var XLstats = {
         }else{
             var postdata = { templateId : tempId}
         }
+        var $fresh = $('#statsContainer .fresh').show();//刷新图标
         $.sajax({
             url : '/report/searchByTemplate',
             data:postdata,
@@ -110,7 +117,7 @@ var XLstats = {
                 _self.editTemplate(tempId,true);
                 _self.showColumnChart(data.data.sectionStatResults);
                 _self.showTermsResult(data.data.termsResultsMap);
-
+                $fresh.hide();
                 if (tempName){
                     $('#statTempName').html(tempName);
                 }
@@ -130,6 +137,8 @@ var XLstats = {
         }else{
             var postdata = { templateId : ids}
         }
+        var $container = $('#funnelContainer');
+        $container.siblings('.fresh').show();
         $.sajax({
             url : '/report/funnelSearch',
             data:postdata,
@@ -139,7 +148,7 @@ var XLstats = {
                 for (key in data.data){
                     funnelData.push([key,data.data[key]]);
                 }
-                $('#funnelContainer').highcharts({
+                $container.highcharts({
                     chart: {type: 'funnel',marginRight: 100},
                     title: {
                         text: '数据漏斗',
@@ -165,6 +174,7 @@ var XLstats = {
                         data: funnelData
                     }]
                 });
+             $container.siblings('.fresh').hide();
             }
         })
     },
