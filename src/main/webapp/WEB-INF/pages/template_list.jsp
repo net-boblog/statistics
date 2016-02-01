@@ -141,8 +141,9 @@
 
             <div class="tab-pane fade rel" id="room3" style="min-height: 600px">
                 <form id="funnelForm">
-                        <label for="funnelIds">模板ID&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <label for="funnelIds">模板ID&nbsp;&nbsp;&nbsp;</label>
                         <input type="text" id="funnelIds" name="templateIds" class="time-input" placeholder="多个ID可用半角逗号隔开" style="width:292px;"/>
+                        <a href="javascript:;" id="tooltip" data-toggle="tooltip" data-content="das"><i class="fa fa-plus-circle fa-2x"></i></a>
                     <br/>
                     <br/>
                         <label>起始时间 </label>
@@ -199,6 +200,11 @@
             </table>
         </div>
     </script>
+    <div id="tooltipTemp" class="hidden">
+        <c:forEach items="${templates}" var="template">
+            <a href="javascript:;" class="funnelAddID" data-id="${template.id}"><b>${template.id}</b> ${template.name}</a><br/>
+        </c:forEach>
+    </div>
 
 <script type="text/html" id="dictListTemp">
     <tr>
