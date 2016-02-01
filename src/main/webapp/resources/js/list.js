@@ -16,7 +16,7 @@ $(function(){
     $(document.body).on('click','.saveTemplate',function(e){
         var tar= $(e.currentTarget).parents('form');
         if (!tar.find('#name').val()){
-            $.alert('请填写模板名','','#updateForm');
+            $.alert('请填写模板名','',tar);
             return ;
         }
         XLstats.saveTemplate(tar[0]);
@@ -24,7 +24,7 @@ $(function(){
     $(document.body).on('click','.saveTemplateAndSearch',function(e){
         var tar= $(e.currentTarget).parents('form');
         if (!tar.find('#name').val()){
-            $.alert('请填写模板名','','#updateForm');
+            $.alert('请填写模板名','',tar);
             return ;
         }
         XLstats.saveTemplate(tar[0],true);
@@ -46,8 +46,9 @@ $(function(){
     $(document.body).on('click','.addExtra',function(e){
 
         var obj= $(e.currentTarget).parents('.form-group');
+        var alertContainer = obj.parents('form');
         if (!obj.find('input').first().val()) {
-            $.alert('请填写附加字段描述','','#updateForm');
+            $.alert('请填写附加字段描述','',alertContainer);
             return ;
         }
         XLstats.addExtra(obj);
@@ -130,12 +131,15 @@ var XLstats = {
             }
         })
     },
+    selectTempId:function(){
+
+    },
     showFunnelSearch:function(ids,from,to){
         var _self = this;
         if (from || to){
-            var postdata = {templateId : ids, from : from , to : to}
+            var postdata = {templateIds : ids, from : from , to : to}
         }else{
-            var postdata = { templateId : ids}
+            var postdata = { templateIds : ids}
         }
         var $container = $('#funnelContainer');
         $container.siblings('.fresh').show();
@@ -148,8 +152,9 @@ var XLstats = {
                 for (key in data.data){
                     funnelData.push([key,data.data[key]]);
                 }
+                console.debug(funnelData);
                 $container.highcharts({
-                    chart: {type: 'funnel',marginRight: 100},
+                    chart: {type: 'funnel',margin: '0 auto'},
                     title: {
                         text: '数据漏斗',
                         x: -50

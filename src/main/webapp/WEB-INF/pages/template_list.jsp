@@ -16,7 +16,7 @@
     </script>
     <style>
         .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
-        #funnelForm{width:408px;}.fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
+        .fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
     </style>
 </head>
 <body>
@@ -140,22 +140,16 @@
             </div>
 
             <div class="tab-pane fade rel" id="room3" style="min-height: 600px">
-                <form id="funnelForm" class="form-horizontal">
-                    <div class="form-group">
-                        <label for="funnelIds" class="col-sm-4">模板ID</label>
-                        <div class="col-sm-8" style="padding: 0;">
-                            <input type="text" id="funnelIds" name="templateIds" class="form-control" placeholder="多个ID可用半角逗号隔开"/>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-sm-4">起始时间：</label>
-                        <div class="col-sm-8" style="padding: 0;">
-                            <input type="text" name="from" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
-                            <span class="text-primary">—</span>
-                            <input type="text" name="to" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary">查询</button>
+                <form id="funnelForm">
+                        <label for="funnelIds">模板ID&nbsp;&nbsp;&nbsp;&nbsp;</label>
+                        <input type="text" id="funnelIds" name="templateIds" class="time-input" placeholder="多个ID可用半角逗号隔开" style="width:292px;"/>
+                    <br/>
+                    <br/>
+                        <label>起始时间 </label>
+                        <input type="text" name="from" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
+                        <span class="text-primary">—</span>
+                        <input type="text" name="to" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
+                    <button class="btn btn-primary btn-xs">查询</button>
                 </form>
                 <div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
                 <div id="funnelContainer"></div>
@@ -401,6 +395,7 @@
 
     <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
     <script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
+    <script src="${ctx}/resources/js/highcharts/modules/funnel.js"></script>
     <script src="${ctx}/resources/js/art-template.js"></script>
     <script src="${ctx}/resources/js/input-mask3/jquery.inputmask.min.js"></script>
     <script src="${ctx}/resources/js/input-mask3/inputmask.min.js"></script>

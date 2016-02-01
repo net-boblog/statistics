@@ -25,12 +25,12 @@ $.bom = {
 };
 
 
-$.alert = function(msg,color,id){
-    if (id){
-       var box = $(id).find('.alertBox');
+$.alert = function(msg,color,$container){
+    if ($container){
+       var box = $container.find('.alertBox');
         if (box.length == 0){
             box = $('<div class="alert-box"></div>');
-            $(id).append(box);
+            $container.append(box);
         }
     }else{
         var box = $('#alertBox');
