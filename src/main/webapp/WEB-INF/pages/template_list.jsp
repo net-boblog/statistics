@@ -7,7 +7,7 @@
   <title>日志统计系统</title>
   <link rel="stylesheet" href="${ctx}/resources/css/bootstrap.min.css">
   <link rel="stylesheet" href="${ctx}/resources/css/zxx.lib.css">
-  <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">  <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
   <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery.form.js"></script>
   <script src="${ctx}/resources/js/bootstrap/bootstrap.min.js"></script>
     <script>
@@ -16,7 +16,7 @@
     </script>
     <style>
         .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
-        #funnelForm{width:408px;}
+        #funnelForm{width:408px;}.fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
     </style>
 </head>
 <body>
@@ -39,7 +39,8 @@
                   <a href="javascript:;" id="searchBytime">查询</a>
               </h4>
           </div>
-          <div class="box-body">
+          <div id="statsContainer" class="box-body rel">
+              <div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
               <div id="columnContainer" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
               <div id="pieContainer" class="row pb20"></div>
               <div id="itemsContainer" class="row bte pt20"></div>
@@ -138,12 +139,12 @@
                 </table>
             </div>
 
-            <div class="tab-pane fade" id="room3" style="min-height: 600px">
+            <div class="tab-pane fade rel" id="room3" style="min-height: 600px">
                 <form id="funnelForm" class="form-horizontal">
                     <div class="form-group">
                         <label for="funnelIds" class="col-sm-4">模板ID</label>
                         <div class="col-sm-8" style="padding: 0;">
-                            <input type="text" id="funnelIds" name="templateIds" class="form-control" placeholder="填写模板ID，多个ID可用半角逗号隔开"/>
+                            <input type="text" id="funnelIds" name="templateIds" class="form-control" placeholder="多个ID可用半角逗号隔开"/>
                         </div>
                     </div>
                     <div class="form-group">
@@ -156,6 +157,7 @@
                     </div>
                     <button class="btn btn-primary">查询</button>
                 </form>
+                <div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
                 <div id="funnelContainer"></div>
             </div>
         </div>
@@ -330,6 +332,13 @@
 						<label for="events${status.index}">${event.description}</label>
 					</span>
          </c:forEach>
+       </div>
+     </div>
+     <div class="form-group">
+       <!-- Search input-->
+       <label  class="col-sm-2 control-label" for="keyWords">关键字</label>
+       <div class="col-sm-8">
+         <input class="form-control" id="keyWords" name="keyWords" type="text" placeholder="关键字" />
        </div>
      </div>
      <div class="form-group">
