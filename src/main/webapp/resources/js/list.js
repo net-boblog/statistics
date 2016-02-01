@@ -88,6 +88,18 @@ $(function(){
         var to = input[2].value ;
         XLstats.showFunnelSearch(ids,from,to);
     });
+    $('#tooltip').tooltip({placement:"right",html:true,title:$('#tooltipTemp').html()});
+    $(document.body).on('click','.funnelAddID',function(e){
+        var id = e.currentTarget.dataset.id;
+        var tar = $('#funnelIds');
+        var str = tar.val();
+        if (str){
+            str += ',' + id;
+        }else{
+            str = id;
+        }
+        tar.val(str);
+    })
 })
 
 var XLstats = {
@@ -154,7 +166,7 @@ var XLstats = {
                 }
                 console.debug(funnelData);
                 $container.highcharts({
-                    chart: {type: 'funnel',margin: '0 auto'},
+                    chart: {type: 'funnel'},
                     title: {
                         text: '数据漏斗',
                         x: -50
