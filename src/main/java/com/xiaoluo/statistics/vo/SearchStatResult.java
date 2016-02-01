@@ -8,6 +8,7 @@ public class SearchStatResult {
     private long pv;
     private double uv;
     private double ip;
+    private long newAdd;
     private String from;
     private String to;
     public long getPv() {
@@ -44,6 +45,14 @@ public class SearchStatResult {
 
     public String getTo() {
         return to;
+    }
+
+    public long getNewAdd() {
+        return newAdd;
+    }
+
+    public void setNewAdd(long newAdd) {
+        this.newAdd = newAdd;
     }
 
     public void setTo(String to) {

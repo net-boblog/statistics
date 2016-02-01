@@ -28,10 +28,10 @@
       <div class="box">
           <div class="box-header">
               <h4>
-                  统计模板: <span id="statTempName" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  Total IP: <span id="totalIp" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  Total PV: <span id="totalPv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  Total UV: <span id="totalUv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  名称: <span id="statTempName" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  <%--Total IP: <span id="totalIp" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>--%>
+                  总PV: <span id="totalPv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                  总UV: <span id="totalUv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   起止时间:
                   <input type="text" id="statStartTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
                   <span class="text-primary">—</span>

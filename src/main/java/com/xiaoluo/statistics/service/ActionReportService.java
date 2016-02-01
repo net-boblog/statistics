@@ -208,7 +208,6 @@ public class ActionReportService {
         }
         SearchRequestBuilder searchRequestBuilder=elaticsearchClient.prepareSearch(INDEX_NAME).setTypes(TYPE_NAME);
         searchRequestBuilder.setExplain(true);
-
         BoolQueryBuilder query=QueryBuilders.boolQuery();
         if(!StringUtils.isEmpty(params.getUids())){
             query.filter(QueryBuilders.termsQuery(UID_FIELD_NAME, params.getUids()));
