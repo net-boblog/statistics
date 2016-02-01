@@ -34,7 +34,7 @@
                   总UV: <span id="totalUv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   起止时间:
                   <input type="text" id="statStartTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
-                  <span class="text-primary">—</span>
+                  <span class="text-primary">到</span>
                   <input type="text" id="statEndTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
                   <a href="javascript:;" id="searchBytime">查询</a>
               </h4>
