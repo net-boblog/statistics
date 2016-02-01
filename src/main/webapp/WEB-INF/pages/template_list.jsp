@@ -336,13 +336,6 @@
      </div>
      <div class="form-group">
        <!-- Search input-->
-       <label  class="col-sm-2 control-label" for="keyWords">关键字</label>
-       <div class="col-sm-8">
-         <input class="form-control" id="keyWords" name="keyWords" type="text" placeholder="关键字" />
-       </div>
-     </div>
-     <div class="form-group">
-       <!-- Search input-->
        <label  class="col-sm-2 control-label" for="interval">间隔时间</label>
        <div class="col-sm-2">
          <input class="form-control" id="interval" name="interval" type="text" placeholder="间隔时间" value="{{ interval || 0 }}"/>

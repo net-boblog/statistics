@@ -36,7 +36,10 @@ public class SearchTemplateController {
         JSONObject jsonObject=JSONObject.parseObject(data);
 
         SearchTemplate template=new SearchTemplate();
-        template.setId(Integer.valueOf(jsonObject.remove("id").toString()));
+        if(jsonObject.containsKey("id")){
+            template.setId(Integer.valueOf(jsonObject.remove("id").toString()));
+        }
+
         if(!jsonObject.containsKey("name")){
             throw new StatisticException("名称不能为空");
         }
