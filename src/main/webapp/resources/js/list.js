@@ -32,11 +32,19 @@ $(function(){
     });
     $(document.body).on('click','.addDict',function(e){
         var tar= $(e.currentTarget).parents('tr');
+        XLstats.addDict(tar);
+    });
+    $(document.body).on('click','.saveDict',function(e){
+        var tar= $(e.currentTarget).parents('tr');
         XLstats.saveDict(tar);
     });
     $(document.body).on('click','.editDict',function(e){
         var tar= $(e.currentTarget).parents('tr');
         XLstats.editDict(tar);
+    });
+    $(document.body).on('click','.delDict',function(e){
+        var id= e.currentTarget.dataset.id;
+        XLstats.delDict(id);
     });
     $(document.body).on('click','.searchDictBtn',function(e){
         var form= $(e.currentTarget).parents('form');
@@ -243,40 +251,88 @@ var XLstats = {
         return arr;
     },
     editDict: function ($tr){
-        var selecttemp = template('selectTemp',{dictType:$tr.data('type')});
+        //var selecttemp = template('selectTemp',{dictType:$tr.data('type')});//修改 -- 编辑时type不可变
         var inputtemp = template('inputTemp',{dictDesc:$tr.data('description')});
-        $tr.find('td').eq(1).html(selecttemp)
-            .next().html(inputtemp)
-            .next().find('button').removeClass('btn-greyPurple editDict').addClass('btn-primary addDict').html('保存');
+        $tr.find('td')/*.eq(1).html(selecttemp)*/
+            .eq(2).html(inputtemp)
+            .next().find('button').removeClass('btn-greyPurple editDict').addClass('btn-primary saveDict').html('保存');
     },
-     saveDict: function ($tr) {
+    delDict: function (id){
+        $.sajax({
+            type:'POST',
+            url: ROOT + '/dict/del',
+            data:{id:id},
+            success:function(data){
+                $.alert('已删除字典！','primary');
+                XLstats.getDictList();
+            }
+        })
+    },
+     addDict: function ($tr) {
             var data = {};
             data.type = $tr.find('.dictType').val();
             data.description = $tr.find('.dictDesc').val();
-            if ($tr.data('id')){
-                data.id = $tr.data('id');
-            }
+            data.id = $tr.find('.dictID').val();
 
-            if ( !data.type || !data.description ){
-                $.alert('请选择字段类型并填写字段描述');
+
+            if ( !data.id || !data.type || !data.description ){
+                $.alert('请 填写ID！！选择字段类型！！并填写字段描述！！');
             }else{
-                $.post(ROOT + '/dict/update',data,function(data){
-                    //console.debug(data);
-                    if (data.code == 0) {
-                        getDictList();
+
+                $.sajax({
+                    type:'POST',
+                    url: ROOT + '/dict/insert',
+                    data:data,
+                    success:function(data){
+                        $.alert('已添加新字典！','primary');
+                        XLstats.getDictList();
                     }
-                },'json');
+                })
+            }
+        },
+    saveDict: function ($tr) {
+            var data = {};
+            //data.type = $tr.find('.dictType').val();
+            data.description = $tr.find('.dictDesc').val();
+            data.id = $tr.data('id');
+
+            if ( !data.description ){
+                $.alert('请填写字段描述');
+            }else{
+                $.sajax({
+                    type:'POST',
+                    url: ROOT + '/dict/update',
+                    data:data,
+                    success:function(){
+                        $.alert('字典已更新','primary');
+                        $tr.find('.dictDesc').remove()
+                            .end()
+                            .find('.center-block')
+                            .html(data.description)
+                            .end()
+                            .find('.saveDict')
+                            .removeClass('btn-primary')
+                            .addClass('btn-greyPurple')
+                            .html('编辑');
+
+                        //XLstats.getDictList();
+                    }
+                })
             }
         },
     getDictList: function (data){
             var data = data || {};
-            $.post(ROOT + '/dict/list',data,function(data){
-                if (data.code == 0) {
+            $('#room2 .fresh').show();
+            $.sajax({
+                type:'POST',
+                url : ROOT + '/dict/list',
+                data: data,
+                success: function (data) {
                     $('#dictList').html(template('dictListTemp',{list:data.data}));
-                }else {
-                    $.alert(data.msg);
+                    $('#room2 .fresh').hide();
                 }
-            },'json')
+            })
+
         },
 
     editTemplate: function (id,isStat){

@@ -125,18 +125,21 @@
                         </div>
                     </div>
                 </form>
-                <table class="table table-bordered">
-                    <thead>
-                    <tr>
-                        <td>ID</td>
-                        <td>字段类型</td>
-                        <td>字段描述</td>
-                        <td>操作</td>
-                    </tr>
-                    </thead>
-                    <tbody id="dictList">
-                    </tbody>
-                </table>
+                <div class="rel">
+                    <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
+                    <table class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <td>ID</td>
+                            <td>字段类型</td>
+                            <td>字段描述</td>
+                            <td>操作</td>
+                        </tr>
+                        </thead>
+                        <tbody id="dictList">
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             <div class="tab-pane fade rel" id="room3" style="min-height: 600px">
@@ -209,7 +212,7 @@
 <script type="text/html" id="dictListTemp">
     <tr>
         <td>
-            <input type="text" placeholder="ID" class="form-control center-block text-center w100"/>
+            <input type="text" placeholder="ID" class="form-control center-block text-center w100 dictID"/>
         </td>
         <td>
             <div class="center-block" style="width: 150px;">
@@ -236,7 +239,10 @@
       <td>{{ item.id}}</td>
       <td>{{ item.type | filterDictType }}</td>
       <td>{{ item.description }}</td>
-      <td><button class="btn btn-greyPurple editDict">编辑</button></td>
+      <td>
+          <button class="btn btn-greyPurple editDict">编辑</button>
+          <button class="btn btn-danger delDict" data-id="{{ item.id}}">删除</button>
+      </td>
     </tr>
   {{/each}}
 </script>
