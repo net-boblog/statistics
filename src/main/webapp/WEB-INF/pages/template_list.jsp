@@ -152,7 +152,7 @@
                         <input type="text" name="to" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
                     <button class="btn btn-primary btn-xs">查询</button>
                 </form>
-                <div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
+                <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
                 <div id="funnelContainer"></div>
             </div>
         </div>
