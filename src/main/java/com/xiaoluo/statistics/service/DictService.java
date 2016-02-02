@@ -43,7 +43,7 @@ public class DictService {
         }
         return i;
     }
-    public int del(int id){
+    public int del(String id){
         int i= dictDao.del(id);
         if(i==1){
             dictCache.remove(id);

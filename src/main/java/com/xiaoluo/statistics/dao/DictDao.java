@@ -48,7 +48,7 @@ public class DictDao {
             return jdbcTemplate.update(sql,new Object[]{description,id});
 
     }
-    public int del(int id){
+    public int del(String id){
         String sql="DELETE FROM t_dict where id=?";
         return jdbcTemplate.update(sql,new Object[]{id});
     }
