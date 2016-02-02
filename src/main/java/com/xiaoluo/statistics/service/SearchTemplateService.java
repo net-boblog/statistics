@@ -27,4 +27,7 @@ public class SearchTemplateService {
     public SearchTemplate get(int id){
         return searchTemplateDao.find(id);
     }
+    public int delete(int id){
+        return searchTemplateDao.delete(id);
+    }
 }
