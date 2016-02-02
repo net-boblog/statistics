@@ -54,6 +54,11 @@ public class SearchTemplateController {
 
         return new ApiResult(template).toString();
     }
+    @RequestMapping("/del")
+    @ResponseBody
+    public String delete(int id){
+        return new ApiResult(searchTemplateService.delete(id)).toString();
+    }
     @RequestMapping("/list")
     public String find(SearchTemplateFilter filter,Model model){
         DataPage<SearchTemplate> searchTemplateDataPage=searchTemplateService.find(filter);

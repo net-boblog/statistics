@@ -79,4 +79,8 @@ public class SearchTemplateDao {
         String sql="SELECT * FROM t_search_template where id="+id;
         return jdbcTemplate.queryForObject(sql,rowMapper);
     }
+    public int delete(int id){
+        String sql="DELETE FROM t_search_template where id="+id;
+        return jdbcTemplate.update(sql);
+    }
 }
