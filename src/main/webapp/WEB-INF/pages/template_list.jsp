@@ -7,7 +7,9 @@
   <title>日志统计系统</title>
   <link rel="stylesheet" href="${ctx}/resources/css/bootstrap.min.css">
   <link rel="stylesheet" href="${ctx}/resources/css/zxx.lib.css">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">  <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
+  <link rel="stylesheet" href="${ctx}/resources/css/font-awesome-4.5.0/css/font-awesome.min.css"/>
+
+  <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery-2.1.4.min.js"></script>
   <script type="text/javascript" src="${ctx}/resources/js/jquery/jquery.form.js"></script>
   <script src="${ctx}/resources/js/bootstrap/bootstrap.min.js"></script>
     <script>
@@ -17,6 +19,7 @@
     <style>
         .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
         .fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
+        .tab-pane{min-height: 600px;}
     </style>
 </head>
 <body>
@@ -86,12 +89,13 @@
                 </thead>
                 <tbody>
                 <c:forEach items="${templates}" var="template">
-                  <tr>
+                  <tr data-id="${template.id}">
                     <td>${template.id}</td>
                     <td>${template.name}</td>
                     <td>
                       <a href="javascript:;" data-id="${template.id}" class="editTemplate">编辑</a>
                       <a href="javascript:;" data-id="${template.id}" data-name="${template.name}" class="showCharts">查看统计</a>
+                      <a href="javascript:;" data-id="${template.id}" class="text-danger delTemplate">删除</a>
                     </td>
                   </tr>
                 </c:forEach>
@@ -142,7 +146,7 @@
                 </div>
             </div>
 
-            <div class="tab-pane fade rel" id="room3" style="min-height: 600px">
+            <div class="tab-pane fade rel" id="room3">
                 <form id="funnelForm">
                         <label for="funnelIds">模板ID&nbsp;&nbsp;&nbsp;</label>
                         <input type="text" id="funnelIds" name="templateIds" class="time-input" placeholder="多个ID可用半角逗号隔开" style="width:292px;"/>
@@ -208,7 +212,17 @@
             <a href="javascript:;" class="funnelAddID" data-id="${template.id}"><b>${template.id}</b> ${template.name}</a><br/>
         </c:forEach>
     </div>
-
+<script id="insertTemplateTemp" type="text/html">
+        <tr data-id="{{ id }}">
+            <td>{{ id }}</td>
+            <td>{{ name }}</td>
+            <td>
+                <a href="javascript:;" data-id="{{ id }}" class="editTemplate">编辑</a>
+                <a href="javascript:;" data-id="{{ id }}" data-name="{{ name }}" class="showCharts">查看统计</a>
+                <a href="javascript:;" data-id="{{ id }}" class="text-danger delTemplate">删除</a>
+            </td>
+        </tr>
+</script>
 <script type="text/html" id="dictListTemp">
     <tr>
         <td>
@@ -240,8 +254,8 @@
       <td>{{ item.type | filterDictType }}</td>
       <td>{{ item.description }}</td>
       <td>
-          <button class="btn btn-greyPurple editDict">编辑</button>
-          <button class="btn btn-danger delDict" data-id="{{ item.id}}">删除</button>
+          <a href="javascript:;" class="text-greyPurple editDict">编辑</a>
+          <a href="javascript:;" class="text-danger delDict" data-id="{{ item.id}}">删除</a>
       </td>
     </tr>
   {{/each}}

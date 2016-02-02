@@ -21,6 +21,12 @@ $(function(){
         }
         XLstats.saveTemplate(tar[0]);
     });
+    $(document.body).on('click','.delTemplate',function(e){
+        var id = e.currentTarget.dataset.id;
+        var $tr = $(e.currentTarget).parents('tr');
+
+        XLstats.delTemplate(id,$tr);
+    });
     $(document.body).on('click','.saveTemplateAndSearch',function(e){
         var tar= $(e.currentTarget).parents('form');
         if (!tar.find('#name').val()){
@@ -124,6 +130,7 @@ var XLstats = {
     },
     showTemplateStat : function(tempId,tempName,from,to) {
         var _self = this;
+        window.screenTop();
         if (from || to){
             var postdata = {templateId : tempId, from : from , to : to}
         }else{
@@ -151,8 +158,16 @@ var XLstats = {
             }
         })
     },
-    selectTempId:function(){
-
+    delTemplate:function(id , $tr){
+        $.sajax({
+            type:'POST',
+            url: ROOT + '/template/del',
+            data:{id:id},
+            success:function(data){
+                $.alert('已删除模板！','primary');
+                $tr.remove();
+            }
+        })
     },
     showFunnelSearch:function(ids,from,to){
         var _self = this;
@@ -255,7 +270,7 @@ var XLstats = {
         var inputtemp = template('inputTemp',{dictDesc:$tr.data('description')});
         $tr.find('td')/*.eq(1).html(selecttemp)*/
             .eq(2).html(inputtemp)
-            .next().find('button').removeClass('btn-greyPurple editDict').addClass('btn-primary saveDict').html('保存');
+            .next().find('.editDict').removeClass('text-greyPurple editDict').addClass('text-primary saveDict').html('保存');
     },
     delDict: function (id){
         $.sajax({
@@ -311,8 +326,8 @@ var XLstats = {
                             .html(data.description)
                             .end()
                             .find('.saveDict')
-                            .removeClass('btn-primary')
-                            .addClass('btn-greyPurple')
+                            .removeClass('text-primary')
+                            .addClass('text-greyPurple')
                             .html('编辑');
 
                         //XLstats.getDictList();
@@ -418,18 +433,31 @@ var XLstats = {
                 }
             });
 
-            $.ajax({
+            $.sajax({
                 url:ROOT + "/template/update",
                 data:"data="+JSON.stringify(data),
                 type:'POST',
                 error:function(e){
                     $.alert(e);
                 },
-                success:function(){
+                success:function(data){
                     if (isStat){
                         //更新统计视图
+                        XLstats.showTemplateStat(data.data.id,data.data.name);
                     }else{
                         $('#templateModal').modal('hide');
+                    }
+                    //更新模板列表
+                    var $tar = $('#resultTable tr[data-id="' + data.data.id + '"]');
+                    if ($tar.length == 0){
+                        $tar = $(template('insertTemplateTemp',{id:data.data.id,name:data.data.name})).appendTo('#resultTable tbody');
+                    }else{
+                        $tar.find('td')
+                            .eq(1)
+                            .html(data.data.name)
+                            .end()
+                            .find('[data-name]')
+                            .data('name',data.data.name);
                     }
                     $.alert('保存成功!','primary');
                 }
