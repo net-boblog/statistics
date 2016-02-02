@@ -35,7 +35,7 @@ public class DictController extends RestBaseController{
         return result.toString();
     }
     @RequestMapping("/del")
-    public @ResponseBody String del(int id){
+    public @ResponseBody String del(String id){
         ApiResult result=new ApiResult();
         if(dictService.del(id)<1){
             result.setCode(StatErrorCode.DELETE_FAIL);
