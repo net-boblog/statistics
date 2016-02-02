@@ -82,7 +82,7 @@ $(function(){
     $('#funnelForm').submit(function(e){
         e.preventDefault();
         var input = e.currentTarget.elements;
-        console.debug(input);
+        //console.debug(input);
         var ids = input[0].value ;
         var from = input[1].value ;
         var to = input[2].value ;
@@ -123,7 +123,7 @@ var XLstats = {
         }
         var $fresh = $('#statsContainer .fresh').show();//刷新图标
         $.sajax({
-            url : '/report/searchByTemplate',
+            url : ROOT + '/report/searchByTemplate',
             data:postdata,
             success : function(data) {
                 // console.debug(data);
@@ -156,15 +156,15 @@ var XLstats = {
         var $container = $('#funnelContainer');
         $container.siblings('.fresh').show();
         $.sajax({
-            url : '/report/funnelSearch',
+            url :ROOT + '/report/funnelSearch',
             data:postdata,
             success : function(data) {
-                 console.debug(data);
+                 //console.debug(data);
                 var funnelData = [];
                 for (key in data.data){
                     funnelData.push([key,data.data[key]]);
                 }
-                console.debug(funnelData);
+                //console.debug(funnelData);
                 $container.highcharts({
                     chart: {type: 'funnel'},
                     title: {
