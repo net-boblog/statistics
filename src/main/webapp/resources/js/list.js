@@ -111,7 +111,7 @@ var XLstats = {
         var tempId = tar.data('id');
         var tempName = tar.data('name');
         this.showTemplateStat(tempId,tempName);//默认显示第一个模板的统计结果
-        this.showFunnelSearch('80,81');
+        //this.showFunnelSearch('80,81');
 
     },
     showTemplateStat : function(tempId,tempName,from,to) {
