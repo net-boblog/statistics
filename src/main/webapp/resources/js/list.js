@@ -130,7 +130,6 @@ var XLstats = {
     },
     showTemplateStat : function(tempId,tempName,from,to) {
         var _self = this;
-        //window.screenTop();
         if (from || to){
             var postdata = {templateId : tempId, from : from , to : to}
         }else{
@@ -350,18 +349,29 @@ var XLstats = {
 
         },
 
-    editTemplate: function (id,isStat){
+    editTemplate: function (id,isStat){//编辑模板 isStat==true 为展示当前统计结果的模板
             $.get(ROOT + '/template/get?id='+id,function(data){
-                //console.debug(data);
                 if (data.code == 0) {
                     var DATA = data.data;
                     var params = JSON.parse(DATA.params);
 
-                    // console.debug(params);
                     DATA.interval = params.interval || '';
                     DATA.termsCountField = params.termsCountField || '';
                     DATA.unit = params.unit || '';
-                    DATA.extra = params.extra || [];
+
+                    if ( params.extra ) {
+                        var extra = params.extra ;
+                        var _arr = [];
+                        for (key in extra ){
+                            var obj = {};
+                            obj.name = key ;
+                            obj.value = extra[key] ;
+                            _arr.push(obj);
+                        }
+                        DATA.extra = _arr;
+                    }else{
+                        DATA.extra = [];
+                    }
 
                     if (isStat) {//统计视图和编辑视图
                         var form = $('#searchForm');
