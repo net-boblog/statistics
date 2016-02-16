@@ -23,11 +23,19 @@ public class AuthInterceptor implements HandlerInterceptor {
                 break;
             }
         }
+        String s="{\"channel\":\"push_sms\",\"identity_type\":\"pc_cookie\",\"identity_value\":\"bbdf82a7-331d-3f4d-988d-51e79178cefc\",\"prefix_page\":\"http:\\/\\/www.xiaoluo.com\\/company\\/list\",\"current_page\":\"http:\\/\\/www.xiaoluo.com\\/company\\/detail\\/1440644480194X3M71GI50qDH?src=pcadlist\",\"terminal\":\"pc\",\"event\":\"detail_pv\",\"extra\":\"[object Object]\",\"ip\":\"119.122.246.154\",\"version\":\"\"}";
         if (!flag) {
             Object obj = request.getSession().getAttribute("SESSION_USER");
             if(obj != null ){
                 flag = true;
             }else{
+                if(null==request.getSession(false)){
+                    if(true==request.getSession(true).isNew()){
+                    }
+                    else{
+                        System.out.println("session已经过期");
+                    }
+                }
                 response.sendRedirect(request.getContextPath()+"/auth/login");
                 flag = false;
             }

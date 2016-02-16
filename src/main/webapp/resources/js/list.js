@@ -130,7 +130,7 @@ var XLstats = {
     },
     showTemplateStat : function(tempId,tempName,from,to) {
         var _self = this;
-        window.screenTop();
+        //window.screenTop();
         if (from || to){
             var postdata = {templateId : tempId, from : from , to : to}
         }else{
