@@ -19,20 +19,128 @@
     <style>
         .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
         .fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
-        .tab-pane{min-height: 600px;}
+        .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding: 5px 2px;border: 1px solid #eee;margin-right: 5px;}.autoFixList ul{padding: 0;margin: 0;}
     </style>
 </head>
 <body>
     <div class="container">
       <div class="page-header">
-        <h1>日志统计系统</h1>
+        <h1>
+            日志统计系统
+            <a href="javascript:;" onclick="document.querySelector('#settingBox').style.display='block'" class="pull-right">
+                <i class="fa fa-cog fa-1x" data-tooltip data-toggle="tooltip" data-placement="left" title="点击修改配置"></i>
+            </a>
+        </h1>
       </div>
+        <%--统计系统功能标签页 start--%>
+        <div class="box" id="settingBox" style="display:none;">
+            <div class="box-header rel">
+                <ul class="tag-group">
+                    <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
+                    <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
+                    <li class="tag tag-default" data-toggle="tab" data-target="#room3">漏斗图</li>
+                </ul>
+                <a href="javascript:;" onclick="document.querySelector('#settingBox').style.display='none'" class="abs t10 r10">隐藏</a>
+            </div>
+            <div class="box-body tab-content">
+
+                <div class="tab-pane fade active in" id="room1">
+                    <div class="clearfix pb20">
+                        <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
+                    </div>
+                    <table id="resultTable" class="table table-bordered">
+                        <thead>
+                        <tr>
+                            <td>模板ID</td>
+                            <td>模板名</td>
+                            <td>操作</td>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <c:forEach items="${templates}" var="template">
+                            <tr data-id="${template.id}">
+                                <td>${template.id}</td>
+                                <td>${template.name}</td>
+                                <td>
+                                    <a href="javascript:;" data-id="${template.id}" class="editTemplate">编辑</a>
+                                    <a href="javascript:;" data-id="${template.id}" data-name="${template.name}" class="showCharts">查看统计</a>
+                                    <a href="javascript:;" data-id="${template.id}" class="text-danger delTemplate">删除</a>
+                                </td>
+                            </tr>
+                        </c:forEach>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane fade" id="room2">
+                    <form class="form-horizontal" id="searchDict">
+                        <div class="form-group">
+                            <label for="searchDictID" class="col-sm-1 control-label">ID</label>
+                            <div class="col-sm-1">
+                                <input type="text" id="searchDictID" class="form-control" name="ids"/>
+                            </div>
+                            <label for="searchDictType" class="col-sm-1 control-label">类型</label>
+                            <div class="col-sm-2">
+                                <select name="type" id="searchDictType" class="form-control">
+                                    <option value="">请选择</option>
+                                    <option value="1">页面</option>
+                                    <option value="2">事件</option>
+                                    <option value="3">渠道</option>
+                                    <option value="4">终端</option>
+                                </select>
+                            </div>
+                            <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
+                            <div class="col-sm-2">
+                                <input type="text" id="searchDictDesc" class="form-control" name="description"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="button" class="btn btn-primary searchDictBtn">搜索</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="rel">
+                        <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <td>ID</td>
+                                <td>字段类型</td>
+                                <td>字段描述</td>
+                                <td>操作</td>
+                            </tr>
+                            </thead>
+                            <tbody id="dictList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="tab-pane fade rel" id="room3">
+                    <form id="funnelForm">
+                        <label for="funnelIds">模板ID&nbsp;&nbsp;&nbsp;</label>
+                        <input type="text" id="funnelIds" name="templateIds" class="time-input" placeholder="多个ID可用半角逗号隔开" style="width:292px;"/>
+                        <a href="javascript:;" id="tooltip" data-toggle="tooltip" data-content="das"><i class="fa fa-plus-circle fa-2x"></i></a>
+                        <br/>
+                        <br/>
+                        <label>起始时间 </label>
+                        <input type="text" name="from" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
+                        <span class="text-primary">—</span>
+                        <input type="text" name="to" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
+                        <button class="btn btn-primary btn-xs">查询</button>
+                    </form>
+                    <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
+                    <div id="funnelContainer"></div>
+                </div>
+            </div>
+        </div>
+        <%--统计系统功能标签页 end--%>
+
         <%--统计结果 图表部分 start--%>
-      <div class="box">
+      <div class="box" id="statResultBox">
           <div class="box-header">
               <h4>
-                  名称: <span id="statTempName" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
-                  <%--Total IP: <span id="totalIp" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>--%>
+                  名称: <a href="javascript:;" id="changeTemplate"><i class="fa fa-cog fa-1x" ></i></a>
+                  <span id="statTempName" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   总PV: <span id="totalPv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   总UV: <span id="totalUv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   起止时间:
@@ -64,107 +172,6 @@
       </div>
         <%--当前统计结果对应的模板 end--%>
 
-        <%--统计系统功能标签页 start--%>
-      <div class="box">
-        <div class="box-header">
-          <ul class="tag-group">
-              <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
-              <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
-              <li class="tag tag-default" data-toggle="tab" data-target="#room3">漏斗图</li>
-          </ul>
-        </div>
-        <div class="box-body tab-content">
-
-            <div class="tab-pane fade active in" id="room1">
-              <div class="clearfix pb20">
-                  <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
-              </div>
-              <table id="resultTable" class="table table-bordered">
-                <thead>
-                <tr>
-                  <td>模板ID</td>
-                  <td>模板名</td>
-                  <td>操作</td>
-                </tr>
-                </thead>
-                <tbody>
-                <c:forEach items="${templates}" var="template">
-                  <tr data-id="${template.id}">
-                    <td>${template.id}</td>
-                    <td>${template.name}</td>
-                    <td>
-                      <a href="javascript:;" data-id="${template.id}" class="editTemplate">编辑</a>
-                      <a href="javascript:;" data-id="${template.id}" data-name="${template.name}" class="showCharts">查看统计</a>
-                      <a href="javascript:;" data-id="${template.id}" class="text-danger delTemplate">删除</a>
-                    </td>
-                  </tr>
-                </c:forEach>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="tab-pane fade" id="room2">
-                <form class="form-horizontal" id="searchDict">
-                    <div class="form-group">
-                        <label for="searchDictID" class="col-sm-1 control-label">ID</label>
-                        <div class="col-sm-1">
-                            <input type="text" id="searchDictID" class="form-control" name="ids"/>
-                        </div>
-                        <label for="searchDictType" class="col-sm-1 control-label">类型</label>
-                        <div class="col-sm-2">
-                            <select name="type" id="searchDictType" class="form-control">
-                                <option value="">请选择</option>
-                                <option value="1">页面</option>
-                                <option value="2">事件</option>
-                                <option value="3">渠道</option>
-                                <option value="4">终端</option>
-                            </select>
-                        </div>
-                        <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
-                        <div class="col-sm-2">
-                            <input type="text" id="searchDictDesc" class="form-control" name="description"/>
-                        </div>
-                        <div class="col-sm-2">
-                            <button type="button" class="btn btn-primary searchDictBtn">搜索</button>
-                        </div>
-                    </div>
-                </form>
-                <div class="rel">
-                    <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
-                    <table class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <td>ID</td>
-                            <td>字段类型</td>
-                            <td>字段描述</td>
-                            <td>操作</td>
-                        </tr>
-                        </thead>
-                        <tbody id="dictList">
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <div class="tab-pane fade rel" id="room3">
-                <form id="funnelForm">
-                        <label for="funnelIds">模板ID&nbsp;&nbsp;&nbsp;</label>
-                        <input type="text" id="funnelIds" name="templateIds" class="time-input" placeholder="多个ID可用半角逗号隔开" style="width:292px;"/>
-                        <a href="javascript:;" id="tooltip" data-toggle="tooltip" data-content="das"><i class="fa fa-plus-circle fa-2x"></i></a>
-                    <br/>
-                    <br/>
-                        <label>起始时间 </label>
-                        <input type="text" name="from" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
-                        <span class="text-primary">—</span>
-                        <input type="text" name="to" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
-                    <button class="btn btn-primary btn-xs">查询</button>
-                </form>
-                <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
-                <div id="funnelContainer"></div>
-            </div>
-        </div>
-      </div>
-        <%--统计系统功能标签页 end--%>
     </div>
 
     <div class="modal fade" id="templateModal">
@@ -226,7 +233,7 @@
 <script type="text/html" id="dictListTemp">
     <tr>
         <td>
-            <input type="text" placeholder="ID" class="form-control center-block text-center w100 dictID"/>
+            <input type="text" placeholder="ID" class="form-control center-block text-center w200 dictID"/>
         </td>
         <td>
             <div class="center-block" style="width: 150px;">
@@ -240,7 +247,7 @@
             </div>
         </td>
         <td>
-            <div class="center-block" style="width: 150px;">
+            <div class="center-block" style="width: 200px;">
                 <input type="text" class="form-control text-center dictDesc" placeholder="字段描述"/>
             </div>
         </td>
@@ -250,9 +257,9 @@
     </tr>
   {{each list as item}}
     <tr data-id="{{ item.id}}" data-type="{{ item.type}}" data-description="{{ item.description}}">
-      <td>{{ item.id}}</td>
+      <td class="ell" style="max-width:400px;">{{ item.id}}</td>
       <td>{{ item.type | filterDictType }}</td>
-      <td>{{ item.description }}</td>
+      <td class="ell" style="max-width:400px;">{{ item.description }}</td>
       <td>
           <a href="javascript:;" class="text-greyPurple editDict">编辑</a>
           <a href="javascript:;" class="text-danger delDict" data-id="{{ item.id}}">删除</a>
@@ -322,38 +329,30 @@
 
      <div class="form-group">
        <label  class="col-sm-2 control-label">来源页</label>
-       <div class="col-sm-8">
-         <c:forEach items="${pages}" var="page" varStatus="status">
-					<span>
-						<input type="checkbox" id="prefixPages${status.index}" name="prefixPages" value="${page.id}">
-						<label for="prefixPages${status.index}">${page.description}</label>
-					</span>
-         </c:forEach>
+       <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页</label></div>
+       <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
+           <input type="text" class="form-control autoFixInput w200" data-type="PAGES" data-name="prefixPages" placeholder="输入关键字检索,点击添加"/>
+           <div class="autoFixList"><ul></ul></div>
        </div>
-
      </div>
      <div class="form-group">
        <label  class="col-sm-2 control-label">停留页</label>
-       <div class="col-sm-8">
-         <c:forEach items="${pages}" var="page" varStatus="status">
-					<span>
-						<input type="checkbox" id="currentPages${status.index}" name="currentPages" value="${page.id}">
-						<label for="currentPages${status.index}">${page.description}</label>
-					</span>
-         </c:forEach>
+       <div class="col-sm-8" id="tempcurrentPages"><label class="control-label">暂未限定停留页</label></div>
+       <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
+           <input type="text" class="form-control autoFixInput w200" data-type="PAGES" data-name="currentPages" placeholder="输入关键字检索,点击添加"/>
+           <div class="autoFixList"><ul></ul></div>
        </div>
      </div>
+
      <div class="form-group">
        <label  class="col-sm-2 control-label">事件</label>
-       <div class="col-sm-8">
-         <c:forEach items="${events}" var="event" varStatus="status">
-					<span>
-						<input type="checkbox" id="events${status.index}" name="events" value="${event.id}">
-						<label for="events${status.index}">${event.description}</label>
-					</span>
-         </c:forEach>
+       <div class="col-sm-8" id="tempevents"><label class="control-label">暂未限定事件</label></div>
+       <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
+           <input type="text" class="form-control autoFixInput w200" data-type="EVENTS" data-name="events" placeholder="输入关键字检索,点击添加"/>
+           <div class="autoFixList"><ul></ul></div>
        </div>
      </div>
+
      <div class="form-group">
        <!-- Search input-->
        <label  class="col-sm-2 control-label" for="interval">间隔时间</label>
@@ -411,7 +410,23 @@
      </div>
     {{/if}}
 </script>
-
+    <script id="checkboxTemp" type="text/html">
+        {{ each list as item index}}
+        <span>
+			<input type="checkbox" id="{{ timestamp }}{{ index }}" name="{{ name }}" value="{{ item.id }}" checked="checked">
+			<label for="{{ timestamp }}{{ index }}">{{ item.description }}</label>
+		</span>
+        {{/each}}
+    </script>
+    <script id="changeTempTemp" type="text/html">
+        <c:forEach items="${templates}" var="template">
+            <a href="javascript:;" data-id="${template.id}" data-name="${template.name}" class="showCharts">${template.name}</a><br/>
+        </c:forEach>
+    </script>
+    <script>
+        window.PAGES = [<c:forEach items="${pages}" var="page" varStatus="status">'${page.description}&&${page.id}',</c:forEach>];
+        window.EVENTS = [<c:forEach items="${events}" var="event" varStatus="status">'${event.description}&&${event.id}',</c:forEach>];
+    </script>
     <script src="${ctx}/resources/js/highcharts/highcharts.js"></script>
     <script src="${ctx}/resources/js/highcharts/modules/exporting.js"></script>
     <script src="${ctx}/resources/js/highcharts/modules/funnel.js"></script>

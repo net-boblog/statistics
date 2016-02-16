@@ -73,6 +73,7 @@ $(function(){
     $(document.body).on('click','.showCharts',function(e){
         var tar = e.currentTarget;
         XLstats.showTemplateStat(tar.dataset.id,tar.dataset.name);
+        $('body').animate({scrollTop: $('#statResultBox').offset().top - 20}, 500);
     });
     $(document.body).on('click','.slideToggleBtn',function(e){
         var $tar = $(e.currentTarget);
@@ -83,7 +84,7 @@ $(function(){
         }else{
             $tar.addClass('active').html('展开');
             $tar.parent().siblings().hide();
-            var str = '筛选条件概览：' + $tar.parents('.box').find('form').serialize().replace(/&/g,' || ');
+            var str = '筛选条件概览：' + decodeURI($tar.parents('.box').find('form').serialize().replace(/&/g,' || '));
             $tar.siblings('span').html(str);
         }
     });
@@ -103,6 +104,8 @@ $(function(){
         XLstats.showFunnelSearch(ids,from,to);
     });
     $('#tooltip').tooltip({placement:"right",html:true,title:$('#tooltipTemp').html()});
+    $('#changeTemplate').tooltip({placement:"bottom",html:true,title:$('#changeTempTemp').html()});
+    $('[data-tooltip]').tooltip();
     $(document.body).on('click','.funnelAddID',function(e){
         var id = e.currentTarget.dataset.id;
         var tar = $('#funnelIds');
@@ -114,6 +117,42 @@ $(function(){
         }
         tar.val(str);
     })
+
+    $(document.body).on('input','.autoFixInput',function(e){
+        var tar = e.currentTarget,
+            type = tar.dataset.type,
+            name = tar.dataset.name,
+            val = tar.value,
+            $box = $(tar).siblings('.autoFixList').children();
+        $box.html('');
+
+
+        if (!val) {
+            return;
+        }
+        var r = new RegExp(val , 'i');
+        var searchList = window[type];
+
+        for (var i = searchList.length-1 ; i>=0 ; i-- ) {
+
+            if (searchList[i].search(r)>-1) {
+                var arr = searchList[i].split('&&');// desc&&id
+
+                var a = $('<li><a href="javascript:;" data-id="'+ arr[1] +'">'+ arr[0] +'</a></li>');
+
+                a[0].onclick = function(e){
+                    var data = [{id: e.target.dataset.id ,description: e.target.textContent}];
+                    $(tar.parentElement.previousElementSibling).append(template('checkboxTemp',{name:name,list:data,timestamp:(new Date()).valueOf()}));
+                }
+                $box.append(a);
+            }
+
+            if ( $box.html().length == 0){
+                $box.html('未能检索到符合关键字的条件');
+            }
+        }
+    })
+
 })
 
 var XLstats = {
@@ -126,6 +165,21 @@ var XLstats = {
         var tempName = tar.data('name');
         this.showTemplateStat(tempId,tempName);//默认显示第一个模板的统计结果
         //this.showFunnelSearch('80,81');
+        window.PAGES_OBJ = this.arr2obj(window.PAGES);
+        window.EVENTS_OBJ = this.arr2obj(window.EVENTS);
+
+    },
+    arr2obj: function(arr) {
+        var objMap = {};
+      for(var i=arr.length; i>0 ; i--){
+          var description = arr[i-1].split('&&')[0];
+          var id = arr[i-1].split('&&')[1];
+          objMap[id] ={
+              id : id,
+              description : description
+          }
+      }
+        return objMap;
 
     },
     showTemplateStat : function(tempId,tempName,from,to) {
@@ -230,18 +284,14 @@ var XLstats = {
             $container.html('');
 
         //来源页
-        var prefix = $('<div class="col-sm-6 pie"></div>').appendTo($container);
-        _self.showPieChart(prefix,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg));
+        data.prefix_page_terms_agg && data.prefix_page_terms_agg.length>0 ? _self.showPieChart($container,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg)) : '';
         //停留页
-         var current = $('<div class="col-sm-6 pie"></div>').appendTo($container);
-         _self.showPieChart(current,'停留页','pages',_self.toPercent(data.current_page_terms_agg));
-
+        data.current_page_terms_agg && data.current_page_terms_agg.length>0 ? _self.showPieChart($container,'停留页','pages',_self.toPercent(data.current_page_terms_agg)) : '';
          //终端
-         var terminal = $('<div class="col-sm-6 pie"></div>').appendTo($container);
-         _self.showPieChart(terminal,'终端','terminal',_self.toPercent(data.terminal_terms_agg));
+        data.terminal_terms_agg && data.terminal_terms_agg.length>0 ? _self.showPieChart($container,'终端','terminal',_self.toPercent(data.terminal_terms_agg)) : '';
          //渠道
-         var channel = $('<div class="col-sm-6 pie"></div>').appendTo($container);
-         _self.showPieChart(channel,'渠道','pages',_self.toPercent(data.channel_terms_agg));
+        data.channel_terms_agg && data.channel_terms_agg.length>0 ? _self.showPieChart($container,'渠道','pages',_self.toPercent(data.channel_terms_agg)) : '';
+
         //事件 用户ID列表 附加字段
         $('#itemsContainer').html('');
         _self.showItemList(data.uid_terms_agg,'用户统计');
@@ -350,6 +400,7 @@ var XLstats = {
         },
 
     editTemplate: function (id,isStat){//编辑模板 isStat==true 为展示当前统计结果的模板
+
             $.get(ROOT + '/template/get?id='+id,function(data){
                 if (data.code == 0) {
                     var DATA = data.data;
@@ -384,11 +435,24 @@ var XLstats = {
                     var arr = ['terminals','channels','currentPages','prefixPages','events'] ;
 
                     for (var n=arr.length-1 ; n>=0 ; n--) {
-                        if (params[arr[n]]){
-                            var checkboxs = form.find('[name="'+arr[n]+'"]');
-                            for(var i=params[arr[n]].length-1 ; i>=0 ;i--){
-                                checkboxs.filter('[value="'+params[arr[n]][i]+'"]').attr('checked','checked');
+                        if (params[arr[n]]){//params[arr[n]] 是一个id 的数组
+
+                            var idList = params[arr[n]];
+
+                            if ( n==0 || n==1) {
+                                var checkboxs = form.find('[name="'+arr[n]+'"]');
+                                for(var i=idList.length-1 ; i>=0 ;i--){
+                                    checkboxs.filter('[value="'+idList[i]+'"]').attr('checked','checked');
+                                }
+                            }else{
+                                var data = [];
+                                for(var i=idList.length-1 ; i>=0 ;i--){
+                                    window.PAGES_OBJ[idList[i]] ? data.push(window.PAGES_OBJ[idList[i]]) : '';
+                                }
+                                var html = template('checkboxTemp',{name:arr[n],list:data,timestamp:(new Date()).valueOf()});
+                                form.find('#temp' + arr[n]).html(html);
                             }
+
                         }
                     }
                     if (!isStat) {
@@ -414,23 +478,24 @@ var XLstats = {
                     continue ;
                 }
 
-                if (data[name] !== undefined) {
+                if (data[name] !== undefined) {//值第二次出现
+                    if ( item.type.toLowerCase() == 'checkbox'){
+                        if ( !item.checked ){
+                            continue;
+                        }
+                    }
                     if (!data[name].push) {//如果不是数组则转化成数组
                         data[name] = [data[name]];
                     }
                     data[name].push(value || '');
-                } else if (item.type.toLowerCase() == 'checkbox' ) {
-                    if ( item.checked ){
-
-                        data[name] = [value] || [];
-                    }
-                } else if (item.type.toLowerCase() == 'radiobox' ) {
-                    if ( item.checked ) {
-
+                } else {
+                    if (item.type.toLowerCase() == 'checkbox'){
+                        if ( item.checked ){
+                            data[name] = [value] || [];
+                        }
+                    }else{
                         data[name] = value || '';
                     }
-                } else {
-                    data[name] = value || '';
                 }
             }
 
@@ -473,7 +538,6 @@ var XLstats = {
                 }
             })
         },
-
     checkHash: function () {
             switch (location.hash.substr(1)){
                 case 'updatedFrom':
@@ -494,7 +558,8 @@ var XLstats = {
                 .html('删除');
             $obj.find('input').val('');
         },
-    showPieChart: function(container,title,seriesName,seriesData){
+    showPieChart: function(pieContainer,title,seriesName,seriesData){
+        var container = $('<div class="col-sm-6 pie"></div>').appendTo(pieContainer);
         $(container).highcharts({
             chart: {
                 plotBackgroundColor: null,

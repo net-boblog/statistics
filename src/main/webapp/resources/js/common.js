@@ -59,6 +59,11 @@ $.sajax = function(option){
         success : function (data){
             if (data.code == 0){
                 option.success(data);
+            }else if(data.code == 10001){
+                $.alert('登陆超时');
+                setTimeout(function () {
+                    location.reload();
+                },2000);
             }else{
                 $.alert(data.msg);
             }
