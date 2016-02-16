@@ -146,10 +146,9 @@ $(function(){
                 }
                 $box.append(a);
             }
-
-            if ( $box.html().length == 0){
-                $box.html('未能检索到符合关键字的条件');
-            }
+        }
+        if ( $box.html().length == 0){
+            $box.html('未能检索到符合关键字的条件');
         }
     })
 
@@ -445,9 +444,9 @@ var XLstats = {
                                     checkboxs.filter('[value="'+idList[i]+'"]').attr('checked','checked');
                                 }
                             }else{
-                                var data = [];
+                                var data = [],objList = window[ n==4 ? "EVENTS_OBJ":"PAGES_OBJ"];
                                 for(var i=idList.length-1 ; i>=0 ;i--){
-                                    window.PAGES_OBJ[idList[i]] ? data.push(window.PAGES_OBJ[idList[i]]) : '';
+                                    objList[idList[i]] ? data.push(objList[idList[i]]) : '';
                                 }
                                 var html = template('checkboxTemp',{name:arr[n],list:data,timestamp:(new Date()).valueOf()});
                                 form.find('#temp' + arr[n]).html(html);

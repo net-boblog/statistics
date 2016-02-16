@@ -20,6 +20,7 @@
         .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
         .fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
         .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding: 5px 2px;border: 1px solid #eee;margin-right: 5px;}.autoFixList ul{padding: 0;margin: 0;}
+        #itemsContainer>.col-sm-4{max-height: 400px;overflow: scroll;}
     </style>
 </head>
 <body>
@@ -206,7 +207,7 @@
                 <tbody>
                 {{each list as item}}
                     <tr>
-                        <td>{{item.value}}</td>
+                        <td class="ell" style="max-width:200px;">{{item.value}}</td>
                         <td>{{item.count}}</td>
                     </tr>
                 {{/each}}
