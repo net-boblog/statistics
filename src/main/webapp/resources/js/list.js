@@ -79,12 +79,12 @@ $(function(){
         var $tar = $(e.currentTarget);
         if ($tar.hasClass('active')){
             $tar.removeClass('active').html('收起');
-            $tar.parent().siblings().show();
+            $tar.siblings('form').show();
             $tar.siblings('span').html('');
         }else{
             $tar.addClass('active').html('展开');
-            $tar.parent().siblings().hide();
-            var str = '筛选条件概览：' + decodeURI($tar.parents('.box').find('form').serialize().replace(/&/g,' || '));
+            $tar.siblings('form').hide();
+            var str = '筛选条件概览：' + decodeURI($tar.siblings('form').serialize().replace(/&/g,' || '));
             $tar.siblings('span').html(str);
         }
     });
@@ -104,7 +104,6 @@ $(function(){
         XLstats.showFunnelSearch(ids,from,to);
     });
     $('#tooltip').tooltip({placement:"right",html:true,title:$('#tooltipTemp').html()});
-    $('#changeTemplate').tooltip({placement:"bottom",html:true,title:$('#changeTempTemp').html()});
     $('[data-tooltip]').tooltip();
     $(document.body).on('click','.funnelAddID',function(e){
         var id = e.currentTarget.dataset.id;
@@ -152,6 +151,10 @@ $(function(){
         }
     })
 
+    $('toggleSetting').click(function(){
+        $('#settingBox').toggle();
+    })
+
 })
 
 var XLstats = {
@@ -159,6 +162,7 @@ var XLstats = {
 
         this.getDictList();//更新字典列表
         this.checkHash();
+        this.freshTempList();
         var tar = $('#resultTable').find('a[data-id]').eq(1);
         var tempId = tar.data('id');
         var tempName = tar.data('name');
@@ -167,6 +171,11 @@ var XLstats = {
         window.PAGES_OBJ = this.arr2obj(window.PAGES);
         window.EVENTS_OBJ = this.arr2obj(window.EVENTS);
 
+    },
+    freshTempList:function(){
+        $('#changeTemplate').tooltip('destroy')
+            .tooltip({placement:"bottom",html:true,title:template('changeTempTemp',{ list:window.TEMPLIST })});
+        $('#tempListTable').html(template('tempListTableTemp',{ list:window.TEMPLIST }));
     },
     arr2obj: function(arr) {
         var objMap = {};
@@ -195,7 +204,7 @@ var XLstats = {
             success : function(data) {
                 // console.debug(data);
                 _self.editTemplate(tempId,true);
-                _self.showColumnChart(data.data.sectionStatResults);
+                _self.showLineChart(data.data.sectionStatResults);
                 _self.showTermsResult(data.data.termsResultsMap);
                 $fresh.hide();
                 if (tempName){
@@ -217,7 +226,15 @@ var XLstats = {
             data:{id:id},
             success:function(data){
                 $.alert('已删除模板！','primary');
-                $tr.remove();
+                var arr=[],n=window.TEMPLIST.length;
+                for (var i = 0 ; i<n ;i++){
+
+                    if (window.TEMPLIST[i].id != id){
+                        arr.push(window.TEMPLIST[i]);
+                    }
+                }
+                window.TEMPLIST = arr ;
+                XLstats.freshTempList();
             }
         })
     },
@@ -522,17 +539,8 @@ var XLstats = {
                         $('#templateModal').modal('hide');
                     }
                     //更新模板列表
-                    var $tar = $('#resultTable tr[data-id="' + data.data.id + '"]');
-                    if ($tar.length == 0){
-                        $tar = $(template('insertTemplateTemp',{id:data.data.id,name:data.data.name})).appendTo('#resultTable tbody');
-                    }else{
-                        $tar.find('td')
-                            .eq(1)
-                            .html(data.data.name)
-                            .end()
-                            .find('[data-name]')
-                            .data('name',data.data.name);
-                    }
+                    window.TEMPLIST.push({id:data.data.id,name:data.data.name});
+                    XLstats.freshTempList();
                     $.alert('保存成功!','primary');
                 }
             })
@@ -597,7 +605,8 @@ var XLstats = {
             var TIME = [] , IP = [] , PV = [], UV = [];
             for (var i = data.length - 1; i >= 0; i--) {
 
-                TIME[i] = data[i].from.substr(5,5) + '至'+ data[i].to.substr(5,5);
+                //TIME[i] = data[i].from.substr(5,5) + '至'+ data[i].to.substr(5,5);
+                TIME[i] = data[i].from + '至'+ data[i].to;
                 IP[i] = data[i].ip;
                 PV[i] = data[i].pv;
                 UV[i] = data[i].uv;
@@ -635,6 +644,65 @@ var XLstats = {
                     column: {
                         pointPadding: 0.2,
                         borderWidth: 0
+                    }
+                },
+                series: [{
+                    name: 'PV',
+                    data: PV
+                }, {
+                    name: 'UV',
+                    data: UV
+                }, {
+                    name: 'IP',
+                    data: IP
+                }]
+            });
+        },
+
+    showLineChart: function (data){
+            var TIME = [] , IP = [] , PV = [], UV = [];
+            for (var i = data.length - 1; i >= 0; i--) {
+
+                //TIME[i] = data[i].from.substr(5,5) + '至'+ data[i].to.substr(5,5);
+                TIME[i] = data[i].from + '至'+ data[i].to;
+                IP[i] = data[i].ip;
+                PV[i] = data[i].pv;
+                UV[i] = data[i].uv;
+            };
+
+            $('#columnContainer').highcharts({
+                chart: {
+                    type: 'line'
+                },
+                title: {
+                    text: '概览'
+                },
+                subtitle: {
+                    text: 'Source: xiaoluo.com'
+                },
+                xAxis: {
+                    categories: TIME,
+                    crosshair: true
+                },
+                yAxis: {
+                    min: 0,
+                    title: {
+                        text: 'times'
+                    }
+                },
+                tooltip: {
+                    headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
+                    pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
+                    '<td style="padding:0"><b>{point.y:.1f}</b></td></tr>',
+                    footerFormat: '</table>',
+                    shared: true,
+                    useHTML: true
+                },
+                plotOptions: {
+                    line: {
+                        dataLabels: {
+                            enabled: true
+                        }
                     }
                 },
                 series: [{
