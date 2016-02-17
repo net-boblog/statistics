@@ -364,15 +364,7 @@ public class ActionReportService {
         searchParams.setTo(to);
         return fullSearch(searchParams);
     }
-    public void groupUsers(SearchParams params){
-        SearchResponse response=createSearchRequestBuilder(params).get();
-        List<SearchStatResult.TermsResult> termsResults=getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
-
-    }
     public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
-        if(params.getFrom()==null){
-            params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
-        }
         if(params.getTo()==null){
             params.setTo(new Date());
         }
@@ -381,6 +373,27 @@ public class ActionReportService {
         }
         if(params.getInterval()==0){
             params.setInterval(1);
+        }
+        long toMills=params.getTo().getTime();
+        if(params.getFrom()==null){
+            switch (SearchParams.SearchIntervalUnit.valueOf(params.getUnit())){
+                case HOUR:
+                    params.setFrom(new Date(toMills-DateKit.DAY_MILLS*2*params.getInterval()));
+                    break;
+                case DAY:
+                    params.setFrom(new Date(toMills-DateKit.DAY_MILLS*7*params.getInterval()));
+                    break;
+                case MINUTE:
+                    params.setFrom(new Date(toMills-DateKit.MINUTE_MILLS*60*params.getInterval()));
+                    break;
+                case MONTH:
+                    params.setFrom(new Date(toMills-DateKit.MONTH_MILLS*12*params.getInterval()));
+                    break;
+                default:
+                    params.setFrom(new Date(toMills-DateKit.DAY_MILLS*7*params.getInterval()));
+                    break;
+
+            }
         }
         MultiSearchRequestBuilder requestBuilder=elaticsearchClient.prepareMultiSearch();
         SearchParams.SearchIntervalUnit unit= SearchParams.SearchIntervalUnit.valueOf(params.getUnit());

@@ -44,6 +44,8 @@ public class RestBaseController {
 
         if(ex instanceof StatisticException){
             StatisticException se=(StatisticException)ex;
+            result.setCode(AllRetCode.CODE_SYSTEM_ERROR);
+            log.error("Statistics error {} :{}",request.getRequestURL(),se.getError());
             result.setMsg(se.getError());
         }else{
             ex.printStackTrace();
