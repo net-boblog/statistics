@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 /**
  * Created by Caedmon on 2016/1/20.
@@ -21,6 +22,7 @@ public class AuthController extends RestBaseController{
     private String authPassword;
     @RequestMapping("/dologin")
     public String doLogin(String name, String password, HttpServletRequest request){
+
         if(authName.equals(name)&&password.equals(authPassword)){
             request.getSession().setAttribute("SESSION_USER",name);
             return "redirect:/template/list";
