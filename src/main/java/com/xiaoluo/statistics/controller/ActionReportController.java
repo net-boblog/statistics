@@ -30,7 +30,7 @@ import java.util.*;
 public class ActionReportController extends RestBaseController{
     @Autowired
     private ActionReportService actionReportService;
-    @RequestMapping("/multiSearch")
+    @RequestMapping("/searchByParams")
     public @ResponseBody String multiSearch(String data) throws Exception{
         SearchParams params=JSON.parseObject(data,SearchParams.class);
 
@@ -38,13 +38,18 @@ public class ActionReportController extends RestBaseController{
     }
     @RequestMapping("/searchByTemplate")
     @ResponseBody
-    public String searchByTemplate(Model model,int templateId,
+    public String searchByTemplate(int templateId,
                                    @RequestParam(required = false) Date from,
                                    @RequestParam (required = false)Date to) throws Exception{
         TotalStatResult totalStatResult=actionReportService.searchByTemplate(templateId,from,to);
         ApiResult apiResult=new ApiResult(totalStatResult);
 
         return apiResult.toString();
+    }
+    @RequestMapping("/getUvByField")
+    @ResponseBody
+    public String getUvByField(String data,Date from,Date to) throws Exception{
+        return null;
     }
     @RequestMapping("/rebuild")
     public @ResponseBody String rebuild(HttpServletRequest request) throws Exception{

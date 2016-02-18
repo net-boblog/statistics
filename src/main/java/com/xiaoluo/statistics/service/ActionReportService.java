@@ -3,19 +3,18 @@ package com.xiaoluo.statistics.service;
 import com.alibaba.fastjson.JSON;
 import com.xiaoluo.statistics.constant.DictType;
 import com.xiaoluo.statistics.constant.IdentityType;
-import com.xiaoluo.statistics.entity.Dict;
-import com.xiaoluo.statistics.search.ElaticsearchManager;
 import com.xiaoluo.statistics.entity.ActionReport;
+import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.entity.FullActionReport;
 import com.xiaoluo.statistics.entity.SearchTemplate;
 import com.xiaoluo.statistics.exception.StatisticException;
+import com.xiaoluo.statistics.search.ElaticsearchManager;
 import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.util.DateKit;
-import com.xiaoluo.statistics.vo.*;
-import org.apache.lucene.sandbox.queries.regex.RegexQuery;
+import com.xiaoluo.statistics.vo.SearchStatResult;
+import com.xiaoluo.statistics.vo.TotalStatResult;
+import com.xiaoluo.statistics.vo.UserBindResult;
 import org.elasticsearch.Version;
-import org.elasticsearch.action.admin.cluster.reroute.ClusterRerouteRequest;
-import org.elasticsearch.action.admin.cluster.reroute.ClusterRerouteRequestBuilder;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.create.CreateIndexResponse;
 import org.elasticsearch.action.admin.indices.mapping.put.PutMappingRequest;
@@ -29,23 +28,20 @@ import org.elasticsearch.action.search.*;
 import org.elasticsearch.action.update.UpdateRequestBuilder;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.cluster.metadata.IndexMetaData;
-import org.elasticsearch.cluster.routing.allocation.RerouteExplanation;
-import org.elasticsearch.cluster.routing.allocation.RoutingAllocation;
-import org.elasticsearch.cluster.routing.allocation.command.AllocationCommand;
-import org.elasticsearch.cluster.routing.allocation.command.AllocationCommands;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.unit.TimeValue;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RegexpQueryBuilder;
+import org.elasticsearch.index.query.TermsQueryBuilder;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.search.aggregations.AbstractAggregationBuilder;
 import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
-import org.elasticsearch.search.aggregations.bucket.SingleBucketAggregation;
-import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.filters.FiltersAggregationBuilder;
 import org.elasticsearch.search.aggregations.bucket.filters.InternalFilters;
 import org.elasticsearch.search.aggregations.bucket.nested.InternalNested;
-import org.elasticsearch.search.aggregations.bucket.nested.NestedAggregator;
 import org.elasticsearch.search.aggregations.bucket.nested.NestedBuilder;
 import org.elasticsearch.search.aggregations.bucket.terms.StringTerms;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
@@ -109,19 +105,44 @@ public class ActionReportService {
         }
         Terms_Agg_Name_Set.put(UID_FIELD_NAME,UID_TERMS_AGG_NAME);
         Terms_Agg_Name_Set.put(CHANNEL_FIELD_NAME,CHANNEL_TERMS_AGG_NAME);
-//        Terms_Agg_Name_Set.put(PREFIX_PAGE_FIELD_NAME,PREFIX_PAGE_TERMS_AGG_NAME);
-//        Terms_Agg_Name_Set.put(CURRENT_PAGE_FIELD_NAME,CURRENT_PAGE_TERMS_AGG_NAME);
         Terms_Agg_Name_Set.put(EVENT_FIELD_NAME,EVENT_TERMS_AGG_NAME);
         Terms_Agg_Name_Set.put(TERMINAL_FIELD_NAME,TERMINAL_TERMS_AGG_NAME);
     }
     public TotalStatResult search(SearchParams params) throws Exception{
-        SearchResponse response= createSearchRequestBuilder(params).get();
-        SearchStatResult searchStatResult=buildStatResult(params,response);
+        checkAndSetDefault(params);
+        List<AbstractAggregationBuilder> totalAggBuilders=new ArrayList<AbstractAggregationBuilder>();
+        totalAggBuilders.add(getIpAggBuilder());
+        totalAggBuilders.add(getUvAggBuilder());
+        List<Dict> dicts=dictService.find(null,DictType.PAGE.value,null);
+        totalAggBuilders.add(getPrefixPageAggBuilder(dicts));
+        totalAggBuilders.add(getCurrentPageAggBuilder(dicts));
+        totalAggBuilders.addAll(getOtherTermsAggBuilder());
+        totalAggBuilders.add(getExtraAgg(params.getExtra()));
+        SearchResponse response= createSearchRequestBuilder(params,totalAggBuilders).get();
+        SearchStatResult searchStatResult=buildStatResult(params.getFrom(),params.getTo(),response);
         Map<String,List<SearchStatResult.TermsResult>> termsResultsMap= getTermsAggResult(response);
         TotalStatResult totalStatResult=new TotalStatResult();
         totalStatResult.setTotalStatResult(searchStatResult);
         totalStatResult.setTermsResultsMap(termsResultsMap);
         return totalStatResult;
+    }
+    public double searchUv(SearchParams params,String field,String condition) throws Exception{
+        checkAndSetDefault(params);
+        List<String> conditions=Arrays.asList(condition);
+        if(field.trim().equals(PREFIX_PAGE_FIELD_NAME)){
+            params.setPrefixPages(conditions);
+        }else if(field.trim().equals(CURRENT_PAGE_FIELD_NAME)){
+            params.setCurrentPages(conditions);
+        }else if(field.trim().equals(TERMINAL_FIELD_NAME)){
+            params.setTerminals(conditions);
+        }else if(field.trim().equals(CHANNEL_FIELD_NAME)){
+            params.setChannels(conditions);
+        }
+        List<AbstractAggregationBuilder> aggregationBuilders=new ArrayList<AbstractAggregationBuilder>();
+        aggregationBuilders.add(getUvAggBuilder());
+        SearchRequestBuilder requestBuidler=createSearchRequestBuilder(params,aggregationBuilders);
+        double uv=getUv(requestBuidler.get());
+        return uv;
     }
     private List<SearchStatResult.TermsResult> buildTermsResultList(InternalFilters filtersAgg){
         List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
@@ -208,7 +229,9 @@ public class ActionReportService {
                     searchParams.setUids(Arrays.asList("0"));
                 }
             }
-            SearchResponse response=createSearchRequestBuilder(searchParams).get();
+            List<AbstractAggregationBuilder> termsAggBuilders=new ArrayList<AbstractAggregationBuilder>();
+            termsAggBuilders.addAll(getOtherTermsAggBuilder());
+            SearchResponse response=createSearchRequestBuilder(searchParams,termsAggBuilders).get();
             termsResults= getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
             result.put(entry.getKey(),termsResults.size());
 
@@ -216,7 +239,10 @@ public class ActionReportService {
         return result;
 
     }
-    public SearchRequestBuilder createSearchRequestBuilder(SearchParams params){
+    /**
+     * 构建基本查询过滤条件,不包括聚合查询请求
+     * */
+    public SearchRequestBuilder createSimpleSearchRequestBuilder(SearchParams params){
         if(params.getFrom()==null){
             params.setFrom(new Date(System.currentTimeMillis()- DateKit.DAY_MILLS*7));
         }
@@ -274,38 +300,78 @@ public class ActionReportService {
             for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
                 TermsQueryBuilder extraTermsQueryBuilder=QueryBuilders.
                         termsQuery(EXTRA_FIELD_NAME+"."+entry.getKey(),entry.getValue().split(","));
-               query.filter(QueryBuilders.nestedQuery(EXTRA_FIELD_NAME,extraTermsQueryBuilder));
+                query.filter(QueryBuilders.nestedQuery(EXTRA_FIELD_NAME,extraTermsQueryBuilder));
             }
-
         }
         searchRequestBuilder.setQuery(query);
-        searchRequestBuilder.addAggregation(new CardinalityBuilder("ip").field(IP_FIELD_NAME));
-        searchRequestBuilder.addAggregation(new CardinalityBuilder("uv").field(UID_FIELD_NAME)).request();
-
-        if(params.getExtra()!=null){
-            NestedBuilder extraBuilder=AggregationBuilders.nested(EXTRA_TERMS_AGG_NAME).path(EXTRA_FIELD_NAME);
-            for(Map.Entry<String,String> entry:params.getExtra().entrySet()){
-                extraBuilder.subAggregation(new TermsBuilder(entry.getKey()).size(0).field(EXTRA_FIELD_NAME+"."+entry.getKey()).minDocCount(1));
+        return searchRequestBuilder;
+    }
+    public SearchRequestBuilder createSearchRequestBuilder(SearchParams params, List<AbstractAggregationBuilder> aggregationBuilders){
+       SearchRequestBuilder searchRequestBuilder=createSimpleSearchRequestBuilder(params);
+        if(aggregationBuilders!=null&&!aggregationBuilders.isEmpty()){
+            for(AbstractAggregationBuilder aggregationBuilder:aggregationBuilders){
+                if(aggregationBuilder!=null){
+                    searchRequestBuilder.addAggregation(aggregationBuilder);
+                }
             }
-            searchRequestBuilder.addAggregation(extraBuilder);
-        }
-        List<Dict> dicts=dictService.find(null,DictType.PAGE.value,null);
-        FiltersAggregationBuilder prefixPageAggBuilder=new FiltersAggregationBuilder(PREFIX_PAGE_TERMS_AGG_NAME);
-        FiltersAggregationBuilder currentPageAggBuilder=new FiltersAggregationBuilder(CURRENT_PAGE_TERMS_AGG_NAME);
-        for(Dict dict:dicts){
-            RegexpQueryBuilder prefixPageRegexQb=QueryBuilders.regexpQuery(PREFIX_PAGE_FIELD_NAME,dict.getId());
-            RegexpQueryBuilder currentPageRegexQb=QueryBuilders.regexpQuery(CURRENT_PAGE_FIELD_NAME,dict.getId());
-            prefixPageAggBuilder.filter(dict.getDescription(),prefixPageRegexQb);
-            currentPageAggBuilder.filter(dict.getDescription(),currentPageRegexQb);
-        }
-        if(!dicts.isEmpty()){
-            searchRequestBuilder.addAggregation(prefixPageAggBuilder);
-            searchRequestBuilder.addAggregation(currentPageAggBuilder);
-        }
-        for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
-            searchRequestBuilder.addAggregation(new TermsBuilder(entry.getValue()).size(0).field(entry.getKey()).minDocCount(1));
         }
         return searchRequestBuilder;
+    }
+
+    /**
+     * 其他字段的聚合统计
+     * */
+    private static List<TermsBuilder> getOtherTermsAggBuilder(){
+        List<TermsBuilder> termsBuilders=new ArrayList<TermsBuilder>();
+        for(Map.Entry<String,String> entry:Terms_Agg_Name_Set.entrySet()){
+            TermsBuilder termsBuilder=new TermsBuilder(entry.getValue()).size(0).field(entry.getKey()).minDocCount(1);
+            termsBuilders.add(termsBuilder);
+        }
+        return termsBuilders;
+    }
+    private static FiltersAggregationBuilder getCurrentPageAggBuilder(List<Dict> dicts){
+        FiltersAggregationBuilder currentPageAgg=new FiltersAggregationBuilder(CURRENT_PAGE_TERMS_AGG_NAME);
+        for(Dict dict:dicts){
+            RegexpQueryBuilder currentPageRegexQb=QueryBuilders.regexpQuery(CURRENT_PAGE_FIELD_NAME,dict.getId());
+            currentPageAgg.filter(dict.getDescription(),currentPageRegexQb);
+        }
+        if(dicts!=null&&!dicts.isEmpty()){
+            return currentPageAgg;
+        }else{
+            return null;
+        }
+
+    }
+    /**
+     * 页面的聚合统计
+     * */
+    private static FiltersAggregationBuilder getPrefixPageAggBuilder(List<Dict> dicts){
+        FiltersAggregationBuilder prefixPageAggBuilder=new FiltersAggregationBuilder(PREFIX_PAGE_TERMS_AGG_NAME);
+        for(Dict dict:dicts){
+            RegexpQueryBuilder prefixPageRegexQb=QueryBuilders.regexpQuery(PREFIX_PAGE_FIELD_NAME,dict.getId());
+            prefixPageAggBuilder.filter(dict.getDescription(),prefixPageRegexQb);
+        }
+        if(dicts!=null&&!dicts.isEmpty()){
+            return prefixPageAggBuilder;
+        }else{
+            return null;
+        }
+    }
+    public static CardinalityBuilder getIpAggBuilder(){
+        return new CardinalityBuilder("ip").field(IP_FIELD_NAME);
+    }
+    public static CardinalityBuilder getUvAggBuilder(){
+        return new CardinalityBuilder("uv").field(UID_FIELD_NAME);
+    }
+    /**
+     * 附加属性的聚合统计
+     * */
+    private static NestedBuilder getExtraAgg(Map<String,String> extra){
+        NestedBuilder extraAgg=AggregationBuilders.nested(EXTRA_TERMS_AGG_NAME).path(EXTRA_FIELD_NAME);
+        for(Map.Entry<String,String> entry:extra.entrySet()){
+            extraAgg.subAggregation(new TermsBuilder(entry.getKey()).size(0).field(EXTRA_FIELD_NAME+"."+entry.getKey()).minDocCount(1));
+        }
+        return extraAgg;
     }
     public void updateUid(final List<String> oldUids,final String newUid) throws Exception{
         Runnable task=new Runnable() {
@@ -351,7 +417,7 @@ public class ActionReportService {
 
     }
     public TotalStatResult fullSearch(SearchParams searchParams) throws Exception{
-        TotalStatResult totalStatResult=search(searchParams);
+        TotalStatResult totalStatResult= search(searchParams);
         List<SearchStatResult> sectionStatResults=multiSearch(searchParams);
         totalStatResult.setSectionStatResults(sectionStatResults);
         return totalStatResult;
@@ -364,7 +430,7 @@ public class ActionReportService {
         searchParams.setTo(to);
         return fullSearch(searchParams);
     }
-    public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
+    private void checkAndSetDefault(SearchParams params){
         if(params.getTo()==null){
             params.setTo(new Date());
         }
@@ -395,6 +461,12 @@ public class ActionReportService {
 
             }
         }
+    }
+    /**
+     * 根据起止时间和时间间隔,分段查询,得到结果
+     * */
+    public List<SearchStatResult> multiSearch(SearchParams params) throws Exception{
+        checkAndSetDefault(params);
         MultiSearchRequestBuilder requestBuilder=elaticsearchClient.prepareMultiSearch();
         SearchParams.SearchIntervalUnit unit= SearchParams.SearchIntervalUnit.valueOf(params.getUnit());
         int interval=params.getInterval();
@@ -422,12 +494,15 @@ public class ActionReportService {
         long prefix=params.getFrom().getTime();
         long to=params.getTo().getTime();
         List<SearchParams> searchParamsList=new ArrayList<SearchParams>();
-        while(prefix<=to){
+        while(prefix+intervalMills<=to){
             final SearchParams itemParams=SearchParams.copyFrom(params);
             itemParams.setFrom(new Date(prefix));
             prefix=prefix+ intervalMills;
             itemParams.setTo(new Date(prefix));
-            requestBuilder.add(createSearchRequestBuilder(itemParams).request());
+            List<AbstractAggregationBuilder> itemAggBuilders=new ArrayList<AbstractAggregationBuilder>();
+            itemAggBuilders.add(getIpAggBuilder());
+            itemAggBuilders.add(getUvAggBuilder());
+            requestBuilder.add(createSearchRequestBuilder(itemParams,itemAggBuilders).request());
             searchParamsList.add(itemParams);
         }
         MultiSearchResponse multiSearchResponse=requestBuilder.execute().get();
@@ -441,20 +516,29 @@ public class ActionReportService {
                 log.error("MultiSearch error {}", item.getFailureMessage());
                 break;
             }
-            SearchStatResult result=buildStatResult(searchParamsList.get(i),response);
+            Date itemFrom=searchParamsList.get(i).getFrom();
+            Date itemTo=searchParamsList.get(i).getTo();
+            SearchStatResult result=buildStatResult(itemFrom,itemTo,response);
             results.add(result);
             i++;
         }
         return results;
     }
-    private SearchStatResult buildStatResult(SearchParams searchParams,SearchResponse response){
+    public double getUv(SearchResponse response){
+        Aggregations aggregations=response.getAggregations();
+        return (Double) aggregations.get("uv").getProperty("value");
+    }
+    /**
+     * 根据SearchResponse,得到PV UV IP的统计结果
+     * */
+    private SearchStatResult buildStatResult(Date from,Date to,SearchResponse response){
         SearchStatResult result=new SearchStatResult();
         result.setPv(response.getHits().totalHits());
         Aggregations aggregations=response.getAggregations();
         result.setUv((Double) aggregations.get("uv").getProperty("value"));
         result.setIp((Double) aggregations.get("ip").getProperty("value"));
-        result.setFrom(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParams.getFrom()));
-        result.setTo(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(searchParams.getTo()));
+        result.setFrom(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(from));
+        result.setTo(DateKit.YYYY_MM_DD_HH_MM_SS_FORMAT.format(to));
         return result;
     }
     private Dict createIfNotExist(String id,DictType type){
