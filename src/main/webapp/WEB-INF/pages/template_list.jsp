@@ -69,22 +69,22 @@
                             <div class="col-sm-1">
                                 <input type="text" id="searchDictID" class="form-control" name="ids"/>
                             </div>
-                            <label for="searchDictType" class="col-sm-1 control-label">类型</label>
-                            <div class="col-sm-2">
-                                <select name="type" id="searchDictType" class="form-control">
-                                    <option value="">请选择</option>
-                                    <option value="1">页面</option>
-                                    <option value="2">事件</option>
-                                    <option value="3">渠道</option>
-                                    <option value="4">终端</option>
-                                </select>
-                            </div>
                             <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
                             <div class="col-sm-2">
                                 <input type="text" id="searchDictDesc" class="form-control" name="description"/>
                             </div>
                             <div class="col-sm-2">
-                                <button type="button" class="btn btn-primary searchDictBtn">搜索</button>
+                                <button type="submit" class="btn btn-primary">搜索</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-1 control-label">类型筛选</label>
+                            <div class="col-sm-11">
+                                <input type="text" name="type" hidden/>
+                                <button type="button" data-val="1" class="btn btn-sm btn-default">页面</button>
+                                <button type="button" data-val="2" class="btn btn-sm btn-default">事件</button>
+                                <button type="button" data-val="3" class="btn btn-sm btn-default">渠道</button>
+                                <button type="button" data-val="4" class="btn btn-sm btn-default">终端</button>
                             </div>
                         </div>
                     </form>
@@ -328,7 +328,7 @@
 
      <div class="form-group" style="margin-bottom: 0;">
        <label  class="col-sm-2 control-label">来源页</label>
-       <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页</label></div>
+       <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页，添加后请点击保存查看</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
            <input type="text" class="form-control autoFixInput w200" data-type="PAGES" data-name="prefixPages" placeholder="输入关键字检索,点击添加"/>
            <div class="autoFixList"><ul></ul></div>
@@ -336,7 +336,7 @@
      </div>
      <div class="form-group" style="margin-bottom: 0;">
        <label  class="col-sm-2 control-label">停留页</label>
-       <div class="col-sm-8" id="tempcurrentPages"><label class="control-label">暂未限定停留页</label></div>
+       <div class="col-sm-8" id="tempcurrentPages"><label class="control-label">暂未限定停留页，添加后请点击保存查看</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
            <input type="text" class="form-control autoFixInput w200" data-type="PAGES" data-name="currentPages" placeholder="输入关键字检索,点击添加"/>
            <div class="autoFixList"><ul></ul></div>
@@ -345,7 +345,7 @@
 
      <div class="form-group">
        <label  class="col-sm-2 control-label">事件</label>
-       <div class="col-sm-8" id="tempevents"><label class="control-label">暂未限定事件</label></div>
+       <div class="col-sm-8" id="tempevents"><label class="control-label">暂未限定事件，添加后请点击保存查看</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
            <input type="text" class="form-control autoFixInput w200" data-type="EVENTS" data-name="events" placeholder="输入关键字检索,点击添加"/>
            <div class="autoFixList"><ul></ul></div>

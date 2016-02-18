@@ -52,10 +52,28 @@ $(function(){
         var id= e.currentTarget.dataset.id;
         XLstats.delDict(id);
     });
-    $(document.body).on('click','.searchDictBtn',function(e){
-        var form= $(e.currentTarget).parents('form');
+    $('#searchDict').submit(function(e){
+        e.preventDefault();
+        e.stopPropagation();
+        var form= $(e.currentTarget);
         var data = form.serialize();
         XLstats.getDictList(data);
+    });
+    $('#searchDict button[data-val]').click(function(e){
+        var $tar = $(e.currentTarget);
+        if ($tar.hasClass('btn-primary')){//选中时取消
+            $tar.removeClass('btn-primary').addClass('btn-default')
+                .siblings('input').val('')
+                .parents('form')
+                .submit();
+        }else{
+            $tar.removeClass('btn-default').addClass('btn-primary')
+                .siblings('.btn-primary').removeClass('btn-primary').addClass('btn-default')
+                .end()
+                .siblings('input').val(e.currentTarget.dataset.val)
+                .parents('form')
+                .submit();
+        }
     });
     $(document.body).on('click','.addExtra',function(e){
 
@@ -362,7 +380,7 @@ var XLstats = {
                     data:data,
                     success:function(data){
                         $.alert('已添加新字典！','primary');
-                        XLstats.getDictList();
+                        $('#searchDict').submit();
                     }
                 })
             }
