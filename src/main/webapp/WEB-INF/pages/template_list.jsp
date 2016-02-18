@@ -326,7 +326,7 @@
        </div>
      </div>
 
-     <div class="form-group" style>
+     <div class="form-group" style="margin-bottom: 0;">
        <label  class="col-sm-2 control-label">来源页</label>
        <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
@@ -334,7 +334,7 @@
            <div class="autoFixList"><ul></ul></div>
        </div>
      </div>
-     <div class="form-group">
+     <div class="form-group" style="margin-bottom: 0;">
        <label  class="col-sm-2 control-label">停留页</label>
        <div class="col-sm-8" id="tempcurrentPages"><label class="control-label">暂未限定停留页</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
