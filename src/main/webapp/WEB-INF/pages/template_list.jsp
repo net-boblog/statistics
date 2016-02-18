@@ -326,7 +326,7 @@
        </div>
      </div>
 
-     <div class="form-group">
+     <div class="form-group" style>
        <label  class="col-sm-2 control-label">来源页</label>
        <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">

@@ -163,10 +163,7 @@ var XLstats = {
         this.getDictList();//更新字典列表
         this.checkHash();
         this.freshTempList();
-        var tar = $('#resultTable').find('a[data-id]').eq(1);
-        var tempId = tar.data('id');
-        var tempName = tar.data('name');
-        this.showTemplateStat(tempId,tempName);//默认显示第一个模板的统计结果
+        this.showTemplateStat(window.TEMPLIST[0].id,window.TEMPLIST[0].name);//默认显示第一个模板的统计结果
         //this.showFunnelSearch('80,81');
         window.PAGES_OBJ = this.arr2obj(window.PAGES);
         window.EVENTS_OBJ = this.arr2obj(window.EVENTS);
