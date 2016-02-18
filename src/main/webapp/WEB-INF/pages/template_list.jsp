@@ -121,7 +121,7 @@
                   <input type="text" id="statStartTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
                   <span class="text-primary">到</span>
                   <input type="text" id="statEndTime" data-inputmask="'mask': 'y-m-d h:s:s'" class="time-input"/>
-                  <a href="javascript:;" id="searchBytime">查询</a>
+                  <%--<a href="javascript:;" id="searchBytime">查询</a>--%>
               </h4>
           </div>
           <%--当前统计结果对应的模板 start--%>
@@ -328,7 +328,7 @@
 
      <div class="form-group" style="margin-bottom: 0;">
        <label  class="col-sm-2 control-label">来源页</label>
-       <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页，添加后请点击保存查看</label></div>
+       <div class="col-sm-8" id="tempprefixPages"><label class="control-label">暂未限定来源页</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
            <input type="text" class="form-control autoFixInput w200" data-type="PAGES" data-name="prefixPages" placeholder="输入关键字检索,点击添加"/>
            <div class="autoFixList"><ul></ul></div>
@@ -336,7 +336,7 @@
      </div>
      <div class="form-group" style="margin-bottom: 0;">
        <label  class="col-sm-2 control-label">停留页</label>
-       <div class="col-sm-8" id="tempcurrentPages"><label class="control-label">暂未限定停留页，添加后请点击保存查看</label></div>
+       <div class="col-sm-8" id="tempcurrentPages"><label class="control-label">暂未限定停留页</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
            <input type="text" class="form-control autoFixInput w200" data-type="PAGES" data-name="currentPages" placeholder="输入关键字检索,点击添加"/>
            <div class="autoFixList"><ul></ul></div>
@@ -345,7 +345,7 @@
 
      <div class="form-group">
        <label  class="col-sm-2 control-label">事件</label>
-       <div class="col-sm-8" id="tempevents"><label class="control-label">暂未限定事件，添加后请点击保存查看</label></div>
+       <div class="col-sm-8" id="tempevents"><label class="control-label">暂未限定事件</label></div>
        <div class="col-sm-8 col-sm-offset-2" class="autoFixBox">
            <input type="text" class="form-control autoFixInput w200" data-type="EVENTS" data-name="events" placeholder="输入关键字检索,点击添加"/>
            <div class="autoFixList"><ul></ul></div>
@@ -397,8 +397,17 @@
      {{/each}}
      {{ if stats}}
      <div class="form-group">
-       <div class="col-sm-offset-2 col-sm-4">
-         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" data-id='{{ id }}' data-name="{{ name }}" value="保存并查看统计结果" />
+       <div class="col-sm-offset-2 col-sm-1">
+         <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />
+       </div>
+       <div class="col-sm-2">
+         <input class="btn btn-block btn-primary saveTemplate" data-saveas="1" type="button" value="保存为新模板" />
+       </div>
+       <div class="col-sm-2">
+         <input class="btn btn-block btn-greyPurple SearchByParams" type="button" value="查看统计，不保存" />
+       </div>
+       <div class="col-sm-2">
+         <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" data-id='{{ id }}' data-name="{{ name }}" value="保存并查看统计" />
        </div>
      </div>
      {{else}}
