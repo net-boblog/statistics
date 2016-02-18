@@ -34,7 +34,7 @@ public class ActionReportController extends RestBaseController{
     public @ResponseBody String multiSearch(String data) throws Exception{
         SearchParams params=JSON.parseObject(data,SearchParams.class);
 
-        return JSON.toJSONString(actionReportService.fullSearch(params));
+        return new ApiResult(actionReportService.fullSearch(params)).toString();
     }
     @RequestMapping("/searchByTemplate")
     @ResponseBody
@@ -48,8 +48,10 @@ public class ActionReportController extends RestBaseController{
     }
     @RequestMapping("/getUvByField")
     @ResponseBody
-    public String getUvByField(String data,Date from,Date to) throws Exception{
-        return null;
+    public String getUvByField(String data,String field,String condition) throws Exception{
+        SearchParams params=JSON.parseObject(data,SearchParams.class);
+        double uv=actionReportService.searchUv(params,field,condition);
+        return new ApiResult(uv).toString();
     }
     @RequestMapping("/rebuild")
     public @ResponseBody String rebuild(HttpServletRequest request) throws Exception{
