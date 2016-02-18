@@ -22,6 +22,7 @@
         .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding:2px;border: 1px solid #eee;margin-right: 5px 5px 0 0;}.autoFixList ul{padding: 0;margin: 0;}
         .autoFixInput{margin:10px 0;}
         #itemsContainer>.col-sm-4{max-height: 400px;overflow: auto;}
+        .pie-uv{font-size: 18px;line-height: 24px;}
     </style>
 </head>
 <body>
@@ -444,6 +445,14 @@
                 </td>
             </tr>
         {{/each}}
+    </script>
+    <script id="pieTips" type="text/html">
+        <span>from：</span>{{ from }}<br/>
+        <span>to：</span>{{ to }}<br/>
+        <span>名称：</span>{{ name }}<br/>
+        <span>占比：</span>{{ percent }}%<br/>
+        <span>PV：</span>{{ pv }}<br/>
+        <span>UV：</span>{{ uv }}<br/>
     </script>
     <script>
         window.PAGES = [<c:forEach items="${pages}" var="page" varStatus="status">'${page.description}&&${page.id}',</c:forEach>];

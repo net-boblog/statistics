@@ -686,7 +686,11 @@ var XLstats = {
             $obj.find('input').val('');
         },
     showPieChart: function(pieContainer,title,seriesName,seriesData){
-        var container = $('<div class="pb20 pie"></div>').appendTo(pieContainer);
+        var container = $('<div class="rel"><p class="pie-uv abs t10 r10 p20 zx2"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
+        var UVbox = container.siblings('p');
+        var UVs = {};//存储动态获得的UV
+        var from = window.TEMPDATA.from;
+        var to = window.TEMPDATA.to;
         $(container).highcharts({
             chart: {
                 plotBackgroundColor: null,
@@ -698,7 +702,7 @@ var XLstats = {
                 text: title
             },
             tooltip: {
-                pointFormat: '占比: <b>{point.percentage:.1f}%</b><br>总数:<b>{point.y:.0f}</b>'
+                pointFormat: '占比: <b>{point.percentage:.1f}%</b><br>PV:<b>{point.y:.0f}</b>'
             },
             plotOptions: {
                 pie: {
@@ -706,22 +710,35 @@ var XLstats = {
                     cursor: 'pointer',
                     dataLabels: {
                         enabled: true,
-                        format: '<b>{point.name}</b>: {point.percentage:.1f} %<br>总数:<b>{point.y:.0f}</b>',
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %<br>PV:<b>{point.y:.0f}</b>',
                         style: {
                             color: (Highcharts.theme && Highcharts.theme.contrastTextColor) || 'black'
                         }
                     },
                     events:{
                         click:function(e){
+                            console.debug(e.point);
                             var id = e.point.name;
-                            $.sajax({
+                            if (UVs[id]){
+                                UVbox.html(template('pieTips',UVs[id]));
+                            }else{
+                                var pieData = {
+                                    from : from,
+                                    to : to,
+                                    name : id,
+                                    percent:e.point.percentage,
+                                    pv: e.point.total
+                                };
+                                $.sajax({
                                     url : ROOT + '/report/getUvByField',
-                                    data : "data="+JSON.stringify(window.TEMPDATA)+"&field="+seriesName+"&id="+id,
+                                    data : "data="+JSON.stringify(window.TEMPDATA)+"&field="+seriesName+"&condition="+id,
                                     success:function(data){
-                                        console.debug(data);
+                                        pieData.uv = data.data;
+                                        UVs[id] = pieData;
+                                        UVbox.html(template('pieTips',pieData));
                                     }
-                            })
-                            console.log('clicked',id);
+                                })
+                            }
                         }
                     }
                 }
