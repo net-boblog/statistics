@@ -19,7 +19,8 @@
     <style>
         .pie{height: 300px;padding: 0;}input.time-input{border: 0 none;border-bottom: 1px solid #eee;color: #6ccb93;text-align: center;outline:none;}
         .fresh{background-color:#fff;position:absolute;top:0;bottom:0;left:0;right:0;text-align: center;z-index:2;display: flex;align-items: center;justify-content: center;}
-        .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding: 5px 2px;border: 1px solid #eee;margin-right: 5px;}.autoFixList ul{padding: 0;margin: 0;}
+        .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding:2px;border: 1px solid #eee;margin-right: 5px 5px 0 0;}.autoFixList ul{padding: 0;margin: 0;}
+        .autoFixInput{margin:10px 0;}
         #itemsContainer>.col-sm-4{max-height: 400px;overflow: auto;}
     </style>
 </head>
@@ -354,10 +355,10 @@
      <div class="form-group">
        <!-- Search input-->
        <label  class="col-sm-2 control-label" for="interval">间隔时间</label>
-       <div class="col-sm-2">
+       <div class="col-sm-3">
          <input class="form-control" id="interval" name="interval" type="text" placeholder="间隔时间" value="{{ interval || 0 }}"/>
        </div>
-         <label  class="col-sm-3 control-label" for="unit">时间单位</label>
+         <%--<label  class="col-sm-3 control-label" for="unit">时间单位</label>--%>
          <div class="col-sm-3">
              <select  id="unit" name="unit" class="form-control">
                  <option value="0" {{if unit=="0" }} selected='selected' {{/if}}>请选择</option>

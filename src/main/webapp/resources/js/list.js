@@ -151,7 +151,7 @@ $(function(){
         }
     })
 
-    $('toggleSetting').click(function(){
+    $('#toggleSetting').click(function(){
         $('#settingBox').toggle();
     })
 
@@ -299,11 +299,11 @@ var XLstats = {
         var $container = $('#pieContainer');
             $container.html('');
 
-        //来源页
-        data.prefix_page_terms_agg && data.prefix_page_terms_agg.length>0 ? _self.showPieChart($container,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg)) : '';
         //停留页
         data.current_page_terms_agg && data.current_page_terms_agg.length>0 ? _self.showPieChart($container,'停留页','pages',_self.toPercent(data.current_page_terms_agg)) : '';
-         //终端
+        //来源页
+        data.prefix_page_terms_agg && data.prefix_page_terms_agg.length>0 ? _self.showPieChart($container,'来源页','pages',_self.toPercent(data.prefix_page_terms_agg)) : '';
+        //终端
         data.terminal_terms_agg && data.terminal_terms_agg.length>0 ? _self.showPieChart($container,'终端','terminal',_self.toPercent(data.terminal_terms_agg)) : '';
          //渠道
         data.channel_terms_agg && data.channel_terms_agg.length>0 ? _self.showPieChart($container,'渠道','pages',_self.toPercent(data.channel_terms_agg)) : '';
@@ -566,7 +566,7 @@ var XLstats = {
             $obj.find('input').val('');
         },
     showPieChart: function(pieContainer,title,seriesName,seriesData){
-        var container = $('<div class="col-sm-6 pie"></div>').appendTo(pieContainer);
+        var container = $('<div class="pb20 pie"></div>').appendTo(pieContainer);
         $(container).highcharts({
             chart: {
                 plotBackgroundColor: null,
