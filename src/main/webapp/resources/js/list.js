@@ -152,6 +152,10 @@ $(function(){
     $('#funnelForm').submit(function(e){
         e.preventDefault();
         var input = e.currentTarget.elements;
+        if (!input[0].value){
+            $.alert('请输入漏斗图统计的模板ID','pinkRed',$('#room3'));
+            return;
+        }
         XLstats.showFunnelSearch(input[0].value,input[1].value,input[2].value);
     });
     //添加模板到漏斗
@@ -310,12 +314,16 @@ var XLstats = {
             url :ROOT + '/report/funnelSearch',
             data:postdata,
             success : function(data) {
-                 //console.debug(data);
                 var funnelData = [];
-                for (key in data.data){
-                    funnelData.push([key,data.data[key]]);
+                for (key in data.data.funnelResult){
+                    funnelData.push([key,data.data.funnelResult[key]]);
                 }
-                //console.debug(funnelData);
+
+                $('#funnelForm').find('input[name="from"]')
+                                .val(new Date(data.data.from).Format('yyyy MM-dd hh:mm:ss'))
+                                .end()
+                                .find('input[name="to"]')
+                                .val(new Date(data.data.to).Format('yyyy MM-dd hh:mm:ss'));
                 $container.highcharts({
                     chart: {type: 'funnel'},
                     title: {
