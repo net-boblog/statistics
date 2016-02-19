@@ -686,7 +686,7 @@ var XLstats = {
             $obj.find('input').val('');
         },
     showPieChart: function(pieContainer,title,seriesName,seriesData){
-        var container = $('<div class="rel"><p class="pie-uv abs t10 r10 p20 zx2"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
+        var container = $('<div class="rel"><p class="pie-uv abs t35 r10 p20 zx2 bde"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
         var UVbox = container.siblings('p');
         var UVs = {};//存储动态获得的UV
         var from = window.TEMPDATA.from;
@@ -722,6 +722,7 @@ var XLstats = {
                             if (UVs[id]){
                                 UVbox.html(template('pieTips',UVs[id]));
                             }else{
+                                $('<div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>').appendTo(UVbox);
                                 var pieData = {
                                     from : from,
                                     to : to,
@@ -736,6 +737,7 @@ var XLstats = {
                                         pieData.uv = data.data;
                                         UVs[id] = pieData;
                                         UVbox.html(template('pieTips',pieData));
+                                        UVbox.show('normal');
                                     }
                                 })
                             }
