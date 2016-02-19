@@ -152,6 +152,10 @@ $(function(){
     $('#funnelForm').submit(function(e){
         e.preventDefault();
         var input = e.currentTarget.elements;
+        if (!input[0].value){
+            $.alert('请输入漏斗图统计的模板ID','pinkRed',$('#room3'));
+            return;
+        }
         XLstats.showFunnelSearch(input[0].value,input[1].value,input[2].value);
     });
     //添加模板到漏斗
@@ -196,10 +200,6 @@ $(function(){
         }
     })
 
-    //全局设置按钮
-    $('#toggleSetting').click(function(){
-        $('#settingBox').toggle();
-    })
     $('[data-tooltip]').tooltip();
     $("[data-inputmask]").inputmask();
 
@@ -310,12 +310,16 @@ var XLstats = {
             url :ROOT + '/report/funnelSearch',
             data:postdata,
             success : function(data) {
-                 //console.debug(data);
                 var funnelData = [];
-                for (key in data.data){
-                    funnelData.push([key,data.data[key]]);
+                for (key in data.data.funnelResult){
+                    funnelData.push([key,data.data.funnelResult[key]]);
                 }
-                //console.debug(funnelData);
+
+                $('#funnelForm').find('input[name="from"]')
+                                .val(new Date(data.data.from).Format('yyyy MM-dd hh:mm:ss'))
+                                .end()
+                                .find('input[name="to"]')
+                                .val(new Date(data.data.to).Format('yyyy MM-dd hh:mm:ss'));
                 $container.highcharts({
                     chart: {type: 'funnel'},
                     title: {
@@ -686,7 +690,7 @@ var XLstats = {
             $obj.find('input').val('');
         },
     showPieChart: function(pieContainer,title,seriesName,seriesData){
-        var container = $('<div class="rel"><p class="pie-uv abs t35 r10 p20 zx2 bde"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
+        var container = $('<div class="rel"><p class="pie-uv abs t35 r10 p10 zx2 wh"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
         var UVbox = container.siblings('p');
         var UVs = {};//存储动态获得的UV
         var from = window.TEMPDATA.from;
@@ -718,16 +722,17 @@ var XLstats = {
                     events:{
                         click:function(e){
                             console.debug(e.point);
-                            var id = e.point.name;
+                            var id = e.point.name,color = e.point.color;
                             if (UVs[id]){
                                 UVbox.html(template('pieTips',UVs[id]));
+                                UVbox.css('background',color);
                             }else{
                                 $('<div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>').appendTo(UVbox);
                                 var pieData = {
                                     from : from,
                                     to : to,
                                     name : id,
-                                    percent:e.point.percentage,
+                                    percent:Number(e.point.percentage).toFixed(4),
                                     pv: e.point.total
                                 };
                                 $.sajax({
@@ -737,7 +742,8 @@ var XLstats = {
                                         pieData.uv = data.data;
                                         UVs[id] = pieData;
                                         UVbox.html(template('pieTips',pieData));
-                                        UVbox.show('normal');
+                                        UVbox.css('background',color);
+                                        UVbox.fadeIn('normal');
                                     }
                                 })
                             }

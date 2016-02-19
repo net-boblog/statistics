@@ -22,7 +22,8 @@
         .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding:2px;border: 1px solid #eee;margin-right: 5px 5px 0 0;}.autoFixList ul{padding: 0;margin: 0;}
         .autoFixInput{margin:10px 0;}
         #itemsContainer>.col-sm-4{max-height: 400px;overflow: auto;}
-        .pie-uv{font-size: 18px;line-height: 24px;display: none;}.pie-uv>span{min-width:60px;text-align: right;display: inline-block;}.pie-uv>small{color:#aaa;}
+        .pie-uv{font-size: 14px;line-height: 20px;display: none;}.pie-uv>span{min-width:60px;text-align: right;display: inline-block;}.pie-uv>small{display: block;text-align: center;}
+        .settingBox{width:80%;margin:10% auto;min-height: 700px;}
     </style>
 </head>
 <body>
@@ -30,88 +31,13 @@
       <div class="page-header">
         <h1>
             日志统计系统
-            <a href="javascript:;" class="pull-right" id="toggleSetting">
+            <a href="javascript:;" class="pull-right" data-toggle="modal" data-target="#settingModal">
                 <i class="fa fa-cog fa-1x" data-tooltip data-toggle="tooltip" data-placement="left" title="点击修改配置"></i>
             </a>
         </h1>
       </div>
-        <%--统计系统功能标签页 start--%>
-        <div class="box" id="settingBox" style="display:none;">
-            <div class="box-header rel">
-                <ul class="tag-group">
-                    <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
-                    <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
-                </ul>
-                <a href="javascript:;" onclick="document.querySelector('#settingBox').style.display='none'" class="abs t10 r10">隐藏</a>
-            </div>
-            <div class="box-body tab-content">
-
-                <div class="tab-pane fade active in" id="room1">
-                    <div class="clearfix pb20">
-                        <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
-                    </div>
-                    <table id="resultTable" class="table table-bordered">
-                        <thead>
-                        <tr>
-                            <td>模板ID</td>
-                            <td>模板名</td>
-                            <td>操作</td>
-                        </tr>
-                        </thead>
-                        <tbody id="tempListTable">
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="tab-pane fade" id="room2">
-                    <form class="form-horizontal" id="searchDict">
-                        <div class="form-group">
-                            <label for="searchDictID" class="col-sm-1 control-label">ID</label>
-                            <div class="col-sm-1">
-                                <input type="text" id="searchDictID" class="form-control" name="ids"/>
-                            </div>
-                            <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
-                            <div class="col-sm-2">
-                                <input type="text" id="searchDictDesc" class="form-control" name="description"/>
-                            </div>
-                            <div class="col-sm-2">
-                                <button type="submit" class="btn btn-primary">搜索</button>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-sm-1 control-label">类型筛选</label>
-                            <div class="col-sm-11">
-                                <input type="text" name="type" hidden/>
-                                <button type="button" data-val="1" class="btn btn-sm btn-default">页面</button>
-                                <button type="button" data-val="2" class="btn btn-sm btn-default">事件</button>
-                                <button type="button" data-val="3" class="btn btn-sm btn-default">渠道</button>
-                                <button type="button" data-val="4" class="btn btn-sm btn-default">终端</button>
-                            </div>
-                        </div>
-                    </form>
-                    <div class="rel">
-                        <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <td>ID</td>
-                                <td>字段类型</td>
-                                <td>字段描述</td>
-                                <td>操作</td>
-                            </tr>
-                            </thead>
-                            <tbody id="dictList">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-        <%--统计系统功能标签页 end--%>
-
         <%--统计结果 图表部分 start--%>
-      <div class="box" id="statResultBox">
+      <div class="box" id="statResultBox" style="overflow: visible;">
           <div class="box-header">
               <h4>
                   名称: <a href="javascript:;" id="changeTemplate"><i class="fa fa-modx fa-1x" ></i></a>
@@ -193,9 +119,86 @@
       </div><!-- /.modal-dialog -->
     </div><!-- /.modal -->
 
+    <%--统计系统功能标签页 start--%>
+    <div class="modal fade" id="settingModal" style="z-index: 1049">
+        <div class="box settingBox">
+            <div class="box-header rel">
+                <ul class="tag-group">
+                    <li class="tag tag-default active" data-toggle="tab" data-target="#room1">模板列表</li>
+                    <li class="tag tag-default" data-toggle="tab" data-target="#room2">字典列表</li>
+                </ul>
+                <button type="button" class="close abs t10 r10" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="box-body tab-content">
+
+                <div class="tab-pane fade active in" id="room1">
+                    <div class="clearfix pb20">
+                        <button class="btn btn-primary addTemplate pull-right">+ 新增模板</button>
+                    </div>
+                    <table id="resultTable" class="table table-bordered table-striped">
+                        <thead>
+                        <tr>
+                            <td>模板ID</td>
+                            <td>模板名</td>
+                            <td>操作</td>
+                        </tr>
+                        </thead>
+                        <tbody id="tempListTable">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="tab-pane fade" id="room2">
+                    <form class="form-horizontal" id="searchDict">
+                        <div class="form-group">
+                            <label for="searchDictID" class="col-sm-2 control-label">ID</label>
+                            <div class="col-sm-2">
+                                <input type="text" id="searchDictID" class="form-control" name="ids"/>
+                            </div>
+                            <label for="searchDictDesc" class="col-sm-1 control-label">描述</label>
+                            <div class="col-sm-2">
+                                <input type="text" id="searchDictDesc" class="form-control" name="description"/>
+                            </div>
+                            <div class="col-sm-2">
+                                <button type="submit" class="btn btn-primary">搜索</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">类型筛选</label>
+                            <div class="col-sm-10">
+                                <input type="text" name="type" hidden/>
+                                <button type="button" data-val="1" class="btn btn-sm btn-default">页面</button>
+                                <button type="button" data-val="2" class="btn btn-sm btn-default">事件</button>
+                                <button type="button" data-val="3" class="btn btn-sm btn-default">渠道</button>
+                                <button type="button" data-val="4" class="btn btn-sm btn-default">终端</button>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="rel">
+                        <div class="fresh hidden"><i class="fa fa-refresh fa-spin fa-5x"></i></div>
+                        <table class="table table-bordered table-striped">
+                            <thead>
+                            <tr>
+                                <td>ID</td>
+                                <td>字段类型</td>
+                                <td>字段描述</td>
+                                <td>操作</td>
+                            </tr>
+                            </thead>
+                            <tbody id="dictList">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div><!-- /.modal -->
+    <%--统计系统功能标签页 end--%>
+
     <script type="text/html" id="statItemListTemp">
         <div class="col-sm-4">
-            <table class="table table-bordered">
+            <table class="table table-bordered table-striped">
                 <caption>{{ title }}</caption>
                 <thead>
                     <tr>
@@ -206,7 +209,7 @@
                 <tbody>
                 {{each list as item}}
                     <tr>
-                        <td class="ell" style="max-width:200px;">{{item.value}}</td>
+                        <td class="ell" style="max-width:200px;" title="{{item.value}}">{{item.value}}</td>
                         <td>{{item.count}}</td>
                     </tr>
                 {{/each}}
@@ -230,6 +233,7 @@
             </td>
         </tr>
 </script>
+
 <script type="text/html" id="dictListTemp">
     <tr>
         <td>
@@ -279,6 +283,7 @@
         </select>
     </div>
 </script>
+
 <script type="text/html" id="inputTemp">
     <div class="center-block" style="width: 150px;">
         <input type="text" class="form-control text-center dictDesc" placeholder="字段描述" value="{{ dictDesc }}"/>
@@ -421,6 +426,7 @@
      </div>
     {{/if}}
 </script>
+
     <script id="checkboxTemp" type="text/html">
         {{ each list as item index}}
         <span>
@@ -429,12 +435,14 @@
 		</span>
         {{/each}}
     </script>
+
     <script id="changeTempTemp" type="text/html">
         {{ each list as template }}
             <a href="javascript:;" data-id="{{template.id}}" data-name="{{template.name}}" class="showCharts">{{template.name}}</a><br/>
         {{/each}}
         <a href="javascript:;" class="addTemplate"><i class="fa fa-plus-square"></i> 新模板</a>
     </script>
+
     <script id="tempListTableTemp" type="text/html">
         {{ each list as template }}
             <tr data-id="{{template.id}}">
@@ -448,14 +456,16 @@
             </tr>
         {{/each}}
     </script>
+
     <script id="pieTips" type="text/html">
         <span>名称：</span>{{ name }}<br/>
         <span>占比：</span>{{ percent }}%<br/>
         <span>PV：</span>{{ pv }}<br/>
         <span>UV：</span>{{ uv }}<br/>
-        <small>{{ from }}</small><br/>
-        <small>{{ to }}</small><br/>
+        <small>{{ from }}</small>
+        <small>{{ to }}</small>
     </script>
+
     <script>
         window.PAGES = [<c:forEach items="${pages}" var="page" varStatus="status">'${page.description}&&${page.id}',</c:forEach>];
         window.EVENTS = [<c:forEach items="${events}" var="event" varStatus="status">'${event.description}&&${event.id}',</c:forEach>];
