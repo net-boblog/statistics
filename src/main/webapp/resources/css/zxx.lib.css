@@ -354,7 +354,7 @@
     left: 0;
     text-align: center;
     color: #FFFFFF;
-    z-index: 9;
+    z-index: 9999;
 }
 #alertBox{
     position: fixed;
@@ -363,7 +363,7 @@
     left: 0;
     text-align: center;
     color: #FFFFFF;
-    z-index: 9;
+    z-index: 9999;
 }
 .alert-msg{
     padding: 10px;

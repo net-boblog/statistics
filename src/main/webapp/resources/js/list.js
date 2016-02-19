@@ -200,10 +200,6 @@ $(function(){
         }
     })
 
-    //全局设置按钮
-    $('#toggleSetting').click(function(){
-        $('#settingBox').toggle();
-    })
     $('[data-tooltip]').tooltip();
     $("[data-inputmask]").inputmask();
 
@@ -694,7 +690,7 @@ var XLstats = {
             $obj.find('input').val('');
         },
     showPieChart: function(pieContainer,title,seriesName,seriesData){
-        var container = $('<div class="rel"><p class="pie-uv abs t35 r10 p20 zx2 bde"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
+        var container = $('<div class="rel"><p class="pie-uv abs t35 r10 p10 zx2 wh"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
         var UVbox = container.siblings('p');
         var UVs = {};//存储动态获得的UV
         var from = window.TEMPDATA.from;
@@ -726,16 +722,17 @@ var XLstats = {
                     events:{
                         click:function(e){
                             console.debug(e.point);
-                            var id = e.point.name;
+                            var id = e.point.name,color = e.point.color;
                             if (UVs[id]){
                                 UVbox.html(template('pieTips',UVs[id]));
+                                UVbox.css('background',color);
                             }else{
                                 $('<div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>').appendTo(UVbox);
                                 var pieData = {
                                     from : from,
                                     to : to,
                                     name : id,
-                                    percent:e.point.percentage,
+                                    percent:Number(e.point.percentage).toFixed(4),
                                     pv: e.point.total
                                 };
                                 $.sajax({
@@ -745,7 +742,8 @@ var XLstats = {
                                         pieData.uv = data.data;
                                         UVs[id] = pieData;
                                         UVbox.html(template('pieTips',pieData));
-                                        UVbox.show('normal');
+                                        UVbox.css('background',color);
+                                        UVbox.fadeIn('normal');
                                     }
                                 })
                             }
