@@ -1,19 +1,12 @@
 package com.xiaoluo.statistics.controller;
 
 import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import com.xiaoluo.statistics.constant.DictType;
-import com.xiaoluo.statistics.entity.Dict;
 import com.xiaoluo.statistics.entity.FullActionReport;
-import com.xiaoluo.statistics.entity.SearchTemplate;
 import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.service.ActionReportService;
-import com.xiaoluo.statistics.service.DictService;
-import com.xiaoluo.statistics.service.SearchTemplateService;
 import com.xiaoluo.statistics.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,7 +43,7 @@ public class ActionReportController extends RestBaseController{
     @ResponseBody
     public String getUvByField(String data,String field,String condition) throws Exception{
         SearchParams params=JSON.parseObject(data,SearchParams.class);
-        double uv=actionReportService.searchUv(params,field,condition);
+        double uv=actionReportService.getUvByFieldCondition(params,field,condition);
         return new ApiResult(uv).toString();
     }
     @RequestMapping("/rebuild")

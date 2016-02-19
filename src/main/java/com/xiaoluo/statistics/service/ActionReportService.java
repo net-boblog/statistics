@@ -11,6 +11,7 @@ import com.xiaoluo.statistics.exception.StatisticException;
 import com.xiaoluo.statistics.search.ElaticsearchManager;
 import com.xiaoluo.statistics.search.SearchParams;
 import com.xiaoluo.statistics.util.DateKit;
+import com.xiaoluo.statistics.vo.FunnelStatResult;
 import com.xiaoluo.statistics.vo.SearchStatResult;
 import com.xiaoluo.statistics.vo.TotalStatResult;
 import com.xiaoluo.statistics.vo.UserBindResult;
@@ -126,23 +127,45 @@ public class ActionReportService {
         totalStatResult.setTermsResultsMap(termsResultsMap);
         return totalStatResult;
     }
-    public double searchUv(SearchParams params,String field,String condition) throws Exception{
+    public double getUvByFieldCondition(SearchParams params, String field, String condition) throws Exception{
+        if(condition==null){
+            return 0;
+        }
         checkAndSetDefault(params);
-        List<String> conditions=Arrays.asList(condition);
+        List<Dict> dicts=null;
         if(field.trim().equals(PREFIX_PAGE_FIELD_NAME)){
-            params.setPrefixPages(conditions);
+            dicts=dictService.find(null,DictType.PAGE.value,condition);
+            params.setPrefixPages(buildDictIds(dicts));
         }else if(field.trim().equals(CURRENT_PAGE_FIELD_NAME)){
-            params.setCurrentPages(conditions);
+            dicts=dictService.find(null,DictType.PAGE.value,condition);
+            params.setCurrentPages(buildDictIds(dicts));
         }else if(field.trim().equals(TERMINAL_FIELD_NAME)){
-            params.setTerminals(conditions);
+            dicts=dictService.find(null,DictType.TERMINAL.value,condition);
+            params.setTerminals(buildDictIds(dicts));
         }else if(field.trim().equals(CHANNEL_FIELD_NAME)){
-            params.setChannels(conditions);
+            dicts=dictService.find(null,DictType.CHANNEL.value,condition);
+            params.setChannels(buildDictIds(dicts));
+        }else if(field.trim().equals(EVENT_FIELD_NAME)){
+            dicts=dictService.find(null,DictType.EVENT.value,condition);
+            params.setEvents(buildDictIds(dicts));
         }
         List<AbstractAggregationBuilder> aggregationBuilders=new ArrayList<AbstractAggregationBuilder>();
         aggregationBuilders.add(getUvAggBuilder());
         SearchRequestBuilder requestBuidler=createSearchRequestBuilder(params,aggregationBuilders);
         double uv=getUv(requestBuidler.get());
         return uv;
+    }
+    private static List<String> buildDictIds(List<Dict> dicts){
+
+        if(dicts!=null&&!dicts.isEmpty()){
+            List<String> result=new ArrayList<String>();
+            for(Dict dict:dicts){
+                result.add(dict.getId());
+            }
+            return result;
+        }else{
+            return null;
+        }
     }
     private List<SearchStatResult.TermsResult> buildTermsResultList(InternalFilters filtersAgg){
         List<SearchStatResult.TermsResult> termsResults=new ArrayList<SearchStatResult.TermsResult>();
@@ -202,7 +225,7 @@ public class ActionReportService {
         }
         return map;
     }
-    public Map<String,Integer> funnelSearch(List<Integer> templateIds,Date from,Date to){
+    public FunnelStatResult funnelSearch(List<Integer> templateIds,Date from,Date to){
         List<String> uids=null;
         List<SearchStatResult.TermsResult> termsResults=null;
         Map<String,Integer> result=new LinkedHashMap<String, Integer>();
@@ -236,7 +259,11 @@ public class ActionReportService {
             result.put(entry.getKey(),termsResults.size());
 
         }
-        return result;
+        FunnelStatResult funnelStatResult=new FunnelStatResult();
+        funnelStatResult.setFunnelResult(result);
+        funnelStatResult.setFrom(from);
+        funnelStatResult.setTo(to);
+        return funnelStatResult;
 
     }
     /**
