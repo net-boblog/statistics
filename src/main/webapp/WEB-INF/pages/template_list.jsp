@@ -22,7 +22,7 @@
         .tab-pane{min-height: 600px;}.autoFixList li{display:inline-block;padding:2px;border: 1px solid #eee;margin-right: 5px 5px 0 0;}.autoFixList ul{padding: 0;margin: 0;}
         .autoFixInput{margin:10px 0;}
         #itemsContainer>.col-sm-4{max-height: 400px;overflow: auto;}
-        .pie-uv{font-size: 18px;line-height: 24px;}
+        .pie-uv{font-size: 18px;line-height: 24px;display: none;}.pie-uv>span{min-width:60px;text-align: right;display: inline-block;}.pie-uv>small{color:#aaa;}
     </style>
 </head>
 <body>
@@ -398,16 +398,18 @@
      {{/each}}
      {{ if stats}}
      <div class="form-group">
-       <div class="col-sm-offset-2 col-sm-1">
+       <div class="col-sm-offset-2 col-sm-3">
          <input class="btn btn-block btn-greyPurple saveTemplate" type="button" value="保存" />
        </div>
-       <div class="col-sm-2">
+       <div class="col-sm-3">
          <input class="btn btn-block btn-primary saveTemplate" data-saveas="1" type="button" value="保存为新模板" />
        </div>
-       <div class="col-sm-2">
+     </div>
+     <div class="form-group">
+       <div class="col-sm-offset-2 col-sm-3">
          <input class="btn btn-block btn-greyPurple SearchByParams" type="button" value="查看统计，不保存" />
        </div>
-       <div class="col-sm-2">
+       <div class="col-sm-3">
          <input class="btn btn-block btn-primary saveTemplateAndSearch" type="button" data-id='{{ id }}' data-name="{{ name }}" value="保存并查看统计" />
        </div>
      </div>
@@ -447,12 +449,12 @@
         {{/each}}
     </script>
     <script id="pieTips" type="text/html">
-        <span>from：</span>{{ from }}<br/>
-        <span>to：</span>{{ to }}<br/>
         <span>名称：</span>{{ name }}<br/>
         <span>占比：</span>{{ percent }}%<br/>
         <span>PV：</span>{{ pv }}<br/>
         <span>UV：</span>{{ uv }}<br/>
+        <small>{{ from }}</small><br/>
+        <small>{{ to }}</small><br/>
     </script>
     <script>
         window.PAGES = [<c:forEach items="${pages}" var="page" varStatus="status">'${page.description}&&${page.id}',</c:forEach>];
