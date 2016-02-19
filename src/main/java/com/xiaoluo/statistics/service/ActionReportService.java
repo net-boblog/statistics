@@ -257,7 +257,8 @@ public class ActionReportService {
             SearchResponse response=createSearchRequestBuilder(searchParams,termsAggBuilders).get();
             termsResults= getTermsAggResult(response).get(UID_TERMS_AGG_NAME);
             result.put(entry.getKey(),termsResults.size());
-
+            from=searchParams.getFrom();
+            to=searchParams.getTo();
         }
         FunnelStatResult funnelStatResult=new FunnelStatResult();
         funnelStatResult.setFunnelResult(result);
