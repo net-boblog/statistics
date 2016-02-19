@@ -315,7 +315,7 @@ public class ActionReportService {
         BoolQueryBuilder currentPagesQueryBuilder=QueryBuilders.boolQuery();
         if(params.getCurrentPages()!=null&&params.getCurrentPages().size()>0){
             for(String prefixPage:params.getCurrentPages()){
-                RegexpQueryBuilder temp=QueryBuilders.regexpQuery(PREFIX_PAGE_FIELD_NAME,prefixPage);
+                RegexpQueryBuilder temp=QueryBuilders.regexpQuery(CURRENT_PAGE_FIELD_NAME,prefixPage);
                 currentPagesQueryBuilder.should(temp);
             }
             query.filter(currentPagesQueryBuilder);
@@ -534,7 +534,7 @@ public class ActionReportService {
             searchParamsList.add(itemParams);
         }
         MultiSearchResponse multiSearchResponse=requestBuilder.execute().get();
-        System.out.println(multiSearchResponse.toString());
+        //System.out.println(multiSearchResponse.toString());
         MultiSearchResponse.Item[] items=multiSearchResponse.getResponses();
         List<SearchStatResult> results=new ArrayList<SearchStatResult>(items.length);
         int i=0;
