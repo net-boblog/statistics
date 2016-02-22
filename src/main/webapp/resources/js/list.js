@@ -145,6 +145,8 @@ $(function(){
     $(document.body).on('click','.SearchByParams',function(e){
         var tar = e.currentTarget;
         var data = XLstats.transformTempData($(tar).parents('form')[0]);
+        data.from = $('#statStartTime').val();
+        data.to = $('#statEndTime').val();
         XLstats.searchByParams(data);
     });
 
@@ -218,9 +220,9 @@ var XLstats = {
 
     },
     freshTempList:function(){
-        $('#changeTemplate').tooltip('destroy')
-            .tooltip({placement:"bottom",html:true,title:template('changeTempTemp',{ list:window.TEMPLIST })});
-        $('#tempListTable').html(template('tempListTableTemp',{ list:window.TEMPLIST }));
+            $('#changeTemplate').tooltip('destroy');
+            $('#changeTemplate').tooltip({placement:"bottom",html:true,title:template('changeTempTemp',{ list:window.TEMPLIST })});
+            $('#tempListTable').html(template('tempListTableTemp',{ list:window.TEMPLIST }));
     },
     dictList2Map: function(arr) {//把字典列表转化成map
         var objMap = {} , n = arr.length;
@@ -492,7 +494,9 @@ var XLstats = {
                             .end()
                             .find('.saveDict')
                             .removeClass('text-primary')
+                            .removeClass('saveDict')
                             .addClass('text-greyPurple')
+                            .addClass('editDict')
                             .html('编辑');
                         //更新数据
                         if (window.PAGES_OBJ[data.id]){
@@ -690,6 +694,15 @@ var XLstats = {
             $obj.find('input').val('');
         },
     showPieChart: function(pieContainer,title,seriesName,seriesData){
+        if (!seriesData || seriesData.length == 0){
+            return false;
+        }
+        var arr = [];
+        for (var i = seriesData.length-1 ; i>=0 ; i--) {
+            if (seriesData[i].y !=0){
+                arr.push(seriesData[i]);
+            }
+        }
         var container = $('<div class="rel"><p class="pie-uv abs t35 r10 p10 zx2 wh"></p><div class="pb20 pie"></div></div>').appendTo(pieContainer).find('div');
         var UVbox = container.siblings('p');
         var UVs = {};//存储动态获得的UV
@@ -721,19 +734,20 @@ var XLstats = {
                     },
                     events:{
                         click:function(e){
-                            console.debug(e.point);
+                            //console.debug(e.point);
                             var id = e.point.name,color = e.point.color;
                             if (UVs[id]){
                                 UVbox.html(template('pieTips',UVs[id]));
                                 UVbox.css('background',color);
                             }else{
                                 $('<div class="fresh"><i class="fa fa-refresh fa-spin fa-5x"></i></div>').appendTo(UVbox);
+                                console.debug(e.point);
                                 var pieData = {
                                     from : from,
                                     to : to,
                                     name : id,
                                     percent:Number(e.point.percentage).toFixed(4),
-                                    pv: e.point.total
+                                    pv: e.point.y
                                 };
                                 $.sajax({
                                     url : ROOT + '/report/getUvByField',
@@ -754,7 +768,7 @@ var XLstats = {
             series: [{
                 name: seriesName,
                 colorByPoint: true,
-                data: seriesData
+                data: arr
             }]
         });
     },
