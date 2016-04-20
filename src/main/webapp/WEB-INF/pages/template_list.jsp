@@ -23,7 +23,7 @@
         .autoFixInput{margin:10px 0;}
         #itemsContainer>.col-sm-4{max-height: 400px;overflow: auto;}
         .pie-uv{font-size: 14px;line-height: 20px;display: none;}.pie-uv>span{min-width:60px;text-align: right;display: inline-block;}.pie-uv>small{display: block;text-align: center;}
-        .settingBox{width:80%;margin:10% auto;min-height: 700px;}
+        .settingBox{width:90%;margin:10% auto;min-height: 700px;}
     </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
       <div class="box" id="statResultBox" style="overflow: visible;">
           <div class="box-header">
               <h4>
-                  名称: <a href="javascript:;" id="changeTemplate"><i class="fa fa-modx fa-1x" ></i></a>
+                  名称: <a href="javascript:;" id="changeTemplate"><i class="fa fa-modx fa-1x"></i></a>
                   <span id="statTempName" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   总PV: <span id="totalPv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
                   总UV: <span id="totalUv" class="text-primary pr20 w50">&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -198,8 +198,8 @@
 
     <script type="text/html" id="statItemListTemp">
         <div class="col-sm-4">
+            <h4><b>{{ title }}</b></h4>
             <table class="table table-bordered table-striped">
-                <caption>{{ title }}</caption>
                 <thead>
                     <tr>
                         <th>ID</th>
