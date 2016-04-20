@@ -1,5 +1,6 @@
 package com.xiaoluo.statistics.controller;
 
+import com.xiaoluo.statistics.vo.ApiResult;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -33,7 +34,9 @@ public class AuthInterceptor implements HandlerInterceptor {
                     if(true==request.getSession(true).isNew()){
                     }
                     else{
-                        System.out.println("session已经过期");
+                        ApiResult result=new ApiResult(10001);
+                        response.getWriter().write(result.toString());
+                        response.getWriter().flush();
                     }
                 }
                 response.sendRedirect(request.getContextPath()+"/auth/login");
